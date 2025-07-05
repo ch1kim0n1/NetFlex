@@ -1,5 +1,5 @@
 <div align="center">
-<img src="public/icon-192x192.png" alt="logo"/>
+<img src="public/icon-192x192.png" alt="logo" style="max-height: 30%;" />
 <h1>NetFlex</h1>
 
 A Netflix-style streaming web app with modern design and responsive layout.
