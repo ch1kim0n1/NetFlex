@@ -4,24 +4,6 @@
 
 A Netflix-style streaming web app with modern design and responsive layout.
 
-<p align="center">
-<a href="https://github.com/ch1kim0n1/NetFlex/blob/master/LICENSE.md">
-<img src="https://img.shields.io/github/license/ch1kim0n1/NetFlex" alt="license"/>
-</a>
-<a href="https://github.com/ch1kim0n1/NetFlex/fork">
-<img src="https://img.shields.io/github/forks/ch1kim0n1/NetFlex?style=social" alt="fork"/>
-</a>
-<a href="https://github.com/ch1kim0n1/NetFlex/stargazers">
-<img src="https://img.shields.io/github/stars/ch1kim0n1/NetFlex?style=social" alt="stars"/>
-</a>
-</p>
-
-<p align="center">
-<a href="https://netflex.vercel.app/">
-<img src="https://vercel.com/button" alt="Deploy to Vercel"/>
-</a>
-</p>
-
 </div>
 
 ## 🌟 Features
@@ -97,17 +79,6 @@ NEXT_PUBLIC_TAWKTO_WIDGET_ID=your_tawkto_widget_id
 - **Analytics**: Google Analytics, Umami
 - **PWA**: Next.js PWA support
 
-## 📄 License
-
-This project is licensed under the GNU General Public License v3.0 - see the [License](https://github.com/ch1kim0n1/NetFlex/blob/master/LICENSE) file for more details
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 🙏 Acknowledgments
-
-- [The Movie Database (TMDB)](https://www.themoviedb.org/) for providing movie and TV show data
-- [Netflix](https://netflix.com) for design inspiration
-- [Next.js](https://nextjs.org/) for the amazing framework
-- [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework
