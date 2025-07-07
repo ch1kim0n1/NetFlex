@@ -41,7 +41,7 @@ function MainLayout({ children, useHead = true, banner, search = true, landing =
       {banner && (
         <div className="pt-3 relative max-lg:hidden">
           <img src={banner} className="w-full h-96 object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-netflix-black/50 to-netflix-black opacity-100"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-netflix-black/10 to-netflix-black opacity-100"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-netflix-black/80 via-transparent to-netflix-black/80"></div>
         </div>
       )}
