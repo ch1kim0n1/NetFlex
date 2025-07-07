@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import { FaFilm, FaTv } from "react-icons/fa";
+import { FaFilm, FaTv, FaDragon } from "react-icons/fa";
 import { CgSearch } from "react-icons/cg";
 import Logo from "../ui/Logo";
 import SearchInput from "../ui/SearchInput";
@@ -69,6 +69,16 @@ function Header({ bg = false, type, showBrowseButtons = false }) {
                     <span>Browse Shows</span>
                   </button>
                 </Link>
+                <Link href={`/anime`}>
+                  <button className={`transition-all px-4 py-2 rounded-lg font-medium flex items-center space-x-2 ${
+                    isActivePage('/anime') 
+                      ? 'bg-netflix-red text-netflix-white shadow-lg' 
+                      : 'bg-netflix-white text-netflix-black hover:bg-netflix-text-gray'
+                  }`}>
+                    <FaDragon />
+                    <span>Browse Anime</span>
+                  </button>
+                </Link>
                 <Link href={`/search`}>
                   <button className={`transition-all px-4 py-2 rounded-lg font-medium flex items-center space-x-2 ${
                     isActivePage('/search') 
@@ -93,6 +103,11 @@ function Header({ bg = false, type, showBrowseButtons = false }) {
                     <FaTv />
                   </button>
                 </Link>
+                <Link href={`/anime`}>
+                  <button className="bg-netflix-white text-netflix-black hover:bg-netflix-text-gray transition-all p-2 rounded-lg" title="Browse Anime">
+                    <FaDragon />
+                  </button>
+                </Link>
                 <Link href={`/search`}>
                   <button className="bg-netflix-white text-netflix-black hover:bg-netflix-text-gray transition-all p-2 rounded-lg" title="Advanced Search">
                     <CgSearch />
@@ -113,6 +128,11 @@ function Header({ bg = false, type, showBrowseButtons = false }) {
               <Link href={`/movies`}>
                 <button title="Movies" className="transition-all text-netflix-white hover:text-netflix-text-gray py-2 hover:underline underline-offset-4 decoration-2 decoration-netflix-red">
                   <span>Movies</span>
+                </button>
+              </Link>
+              <Link href={`/anime`}>
+                <button title="Anime" className="transition-all text-netflix-white hover:text-netflix-text-gray py-2 hover:underline underline-offset-4 decoration-2 decoration-netflix-red">
+                  <span>Anime</span>
                 </button>
               </Link>
               <Link href={`/trending`}>

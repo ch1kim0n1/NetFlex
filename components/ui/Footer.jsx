@@ -24,6 +24,9 @@ function Footer() {
                 <Link href="/movies" title="Movies Homepage" className="block text-netflix-text-gray hover:text-netflix-white transition-all cursor-pointer">
                   Movies
                 </Link>
+                <Link href="/anime" title="Anime Homepage" className="block text-netflix-text-gray hover:text-netflix-white transition-all cursor-pointer">
+                  Anime
+                </Link>
                 <Link href="/trending" title="Trending Content" className="block text-netflix-text-gray hover:text-netflix-white transition-all cursor-pointer">
                   Trending
                 </Link>

@@ -8,13 +8,15 @@ import ParticleBackground from "../../components/ui/ParticleBackground";
 import { FaSearch, FaFilter, FaTimes, FaSort, FaArrowLeft } from 'react-icons/fa';
 import { searchMovies, getMovieGenres, getPopularMovies, getTrendingMovies } from "../../src/handlers/movies";
 import { searchShows, getGenres, getPopularShows, getTrendingShows } from "../../src/handlers/shows";
+import { getPopularAnime, getTrendingAnime, searchAnime } from "../../src/handlers/anime";
+import AnimeCard from "../../components/anime/AnimeCard";
 
 export default function GlobalSearch() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [contentType, setContentType] = useState('all'); // all, movies, shows
+  const [contentType, setContentType] = useState('all'); // all, movies, shows, anime
   const [selectedGenre, setSelectedGenre] = useState('');
   const [sortBy, setSortBy] = useState('relevance'); // relevance, rating, date, title
   const [movieGenres, setMovieGenres] = useState([]);
@@ -80,6 +82,14 @@ export default function GlobalSearch() {
         ]);
         content = [...content, ...popular, ...trending];
       }
+      
+      if (contentType === 'all' || contentType === 'anime') {
+        const [popular, trending] = await Promise.all([
+          getPopularAnime(20),
+          getTrendingAnime(20)
+        ]);
+        content = [...content, ...popular, ...trending];
+      }
 
       // Remove duplicates and add type
       let uniqueContent = content.reduce((acc, item) => {
@@ -123,6 +133,11 @@ export default function GlobalSearch() {
         const showResults = await searchShows(searchQuery, 50);
         allResults = [...allResults, ...showResults.map(item => ({ ...item, type: 'show' }))];
       }
+      
+      if (contentType === 'all' || contentType === 'anime') {
+        const animeResults = await searchAnime(searchQuery, 50);
+        allResults = [...allResults, ...animeResults.map(item => ({ ...item, type: 'anime' }))];
+      }
 
       // Apply genre filter
       if (selectedGenre) {
@@ -140,6 +155,10 @@ export default function GlobalSearch() {
   };
 
   const getItemType = (item) => {
+    // Check if it's explicitly marked as anime
+    if (item.type === 'anime') {
+      return 'anime';
+    }
     // Better detection logic for movies vs shows
     if (item.seasons !== undefined || item.totalEpisodes !== undefined || item.number_of_seasons !== undefined) {
       return 'show';
@@ -262,6 +281,7 @@ export default function GlobalSearch() {
                 <option value="all">All Content</option>
                 <option value="movies">Movies</option>
                 <option value="shows">TV Shows</option>
+            <option value="anime">Anime</option>
               </select>
 
               {/* Sort Options */}
@@ -328,11 +348,13 @@ export default function GlobalSearch() {
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                 {results.map((item) => (
                   <div key={`${item.type}-${item.id}`}>
-                    {item.type === 'movie' ? (
-                      <MovieCard data={item} />
-                    ) : (
-                      <ShowCard data={item} />
-                    )}
+                                      {item.type === 'movie' ? (
+                    <MovieCard data={item} />
+                  ) : item.type === 'anime' ? (
+                    <AnimeCard data={item} />
+                  ) : (
+                    <ShowCard data={item} />
+                  )}
                   </div>
                 ))}
               </div>

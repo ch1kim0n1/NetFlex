@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FaPlay, FaInfoCircle, FaFire } from "react-icons/fa";
+import { FaPlay, FaInfoCircle, FaFire, FaDragon } from "react-icons/fa";
 import React, { useState } from "react";
 import NetFlexIntro from "./ui/NetFlexIntro";
 
@@ -135,6 +135,29 @@ function LandingPage() {
                   </p>
                   <div className="flex items-center text-netflix-red group-hover:text-netflix-white transition-colors">
                     <span className="font-semibold">Browse Movies</span>
+                    <span className="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+            
+            <Link href="/anime">
+              <div className="group relative overflow-hidden rounded-lg bg-netflix-gray/20 hover:bg-netflix-gray/30 transition-all duration-300 transform hover:scale-105">
+                <div className="p-8">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-16 h-16 bg-netflix-red rounded-full flex items-center justify-center">
+                      <FaDragon className="text-netflix-white text-2xl" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-netflix-white">Anime</h3>
+                      <p className="text-netflix-text-gray">Japanese animation</p>
+                    </div>
+                  </div>
+                  <p className="text-netflix-text-gray mb-6">
+                    Explore the world of anime, from popular series to critically acclaimed shows.
+                  </p>
+                  <div className="flex items-center text-netflix-red group-hover:text-netflix-white transition-colors">
+                    <span className="font-semibold">Browse Anime</span>
                     <span className="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
                   </div>
                 </div>
