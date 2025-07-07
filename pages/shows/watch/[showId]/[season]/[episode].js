@@ -5,6 +5,7 @@ import MainLayout from '../../../../../components/ui/MainLayout';
 import StreamingPlayer from '../../../../../components/StreamingPlayer';
 import SeasonEpisodeSelector from '../../../../../components/shows/SeasonEpisodeSelector';
 import { getShowDetails, getShowEpisodes, getShowSeasons } from '../../../../../src/handlers/shows';
+import { updateShowProgress } from '../../../../../src/utils/viewingHistory';
 import { FaArrowLeft, FaPlay, FaPlus, FaThumbsUp, FaShare, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Link from 'next/link';
 
@@ -65,6 +66,21 @@ function WatchEpisode() {
 
     fetchData();
   }, [showId, season, episode]);
+
+  // Track viewing progress when episode starts playing
+  useEffect(() => {
+    if (show && currentEpisode && showId && season && episode) {
+      // Add to recently watched when user starts watching (5% progress)
+      const trackInitialView = () => {
+        updateShowProgress(show, parseInt(season), parseInt(episode), 5);
+      };
+
+      // Add a small delay to ensure the episode has actually started
+      const timer = setTimeout(trackInitialView, 10000); // 10 seconds after page load
+
+      return () => clearTimeout(timer);
+    }
+  }, [show, currentEpisode, showId, season, episode]);
 
   const navigateToEpisode = (newEpisode) => {
     router.push(`/shows/watch/${showId}/${season}/${newEpisode}`);

@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import MainLayout from "../../components/ui/MainLayout";
 import ContentRow from "../../components/ui/ContentRow";
 import MovieCard from "../../components/movies/MovieCard";
+import RecentlyWatchedCard from "../../components/ui/RecentlyWatchedCard";
 import { getPopularMovies, getTrendingMovies, getTopRatedMovies, getUpcomingMovies, getNowPlayingMovies } from "../../src/handlers/movies";
+import { getRecentlyWatchedMovies } from "../../src/utils/viewingHistory";
 
 export default function Movies() {
   const [popularMovies, setPopularMovies] = useState([]);
@@ -11,6 +13,7 @@ export default function Movies() {
   const [topRatedMovies, setTopRatedMovies] = useState([]);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
+  const [recentlyWatchedMovies, setRecentlyWatchedMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,6 +32,10 @@ export default function Movies() {
         setTopRatedMovies(topRated);
         setUpcomingMovies(upcoming);
         setNowPlayingMovies(nowPlaying);
+        
+        // Load recently watched movies from localStorage
+        const recentlyWatched = getRecentlyWatchedMovies();
+        setRecentlyWatchedMovies(recentlyWatched);
       } catch (error) {
         console.error('Error fetching movies:', error);
       } finally {
@@ -38,6 +45,10 @@ export default function Movies() {
 
     fetchMovies();
   }, []);
+
+  const handleRemoveFromRecentlyWatched = (movieId) => {
+    setRecentlyWatchedMovies(prev => prev.filter(movie => movie.id !== movieId));
+  };
 
   if (loading) {
     return (
@@ -64,6 +75,19 @@ export default function Movies() {
               From blockbuster hits to indie gems, discover your next favorite movie.
             </p>
           </div>
+
+          {recentlyWatchedMovies.length > 0 && (
+            <ContentRow title="Continue Watching">
+              {recentlyWatchedMovies.map((movie) => (
+                <div key={movie.id} className="flex-none w-80">
+                  <RecentlyWatchedCard 
+                    data={movie} 
+                    onRemove={handleRemoveFromRecentlyWatched}
+                  />
+                </div>
+              ))}
+            </ContentRow>
+          )}
 
           {trendingMovies.length > 0 && (
             <ContentRow title="Trending Movies">

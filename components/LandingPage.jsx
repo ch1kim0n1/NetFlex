@@ -1,13 +1,25 @@
 import Link from "next/link";
 import { FaPlay, FaInfoCircle, FaFire } from "react-icons/fa";
-import React from "react";
+import React, { useState } from "react";
+import NetFlexIntro from "./ui/NetFlexIntro";
 
 function LandingPage() {
+  const [showIntro, setShowIntro] = useState(true);
+  
   // Fixed permanent background image - the cinematic one
   const permanentHeroImage = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2325&q=80";
 
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+  };
+
+  // Show intro first
+  if (showIntro) {
+    return <NetFlexIntro onComplete={handleIntroComplete} />;
+  }
+
   return (
-    <div className="min-h-screen bg-netflix-black">
+    <div className="min-h-screen bg-netflix-black animate-fadeIn" style={{ animationDuration: '1.5s' }}>
       {/* Hero Section */}
       <div className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Animated Background */}

@@ -3,13 +3,16 @@ import { useEffect, useState } from "react";
 import MainLayout from "../../components/ui/MainLayout";
 import ContentRow from "../../components/ui/ContentRow";
 import ShowCard from "../../components/shows/ShowCard";
+import RecentlyWatchedCard from "../../components/ui/RecentlyWatchedCard";
 import { getPopularShows, getTrendingShows, getTopRatedShows, getOnTheAirShows } from "../../src/handlers/shows";
+import { getRecentlyWatchedShows } from "../../src/utils/viewingHistory";
 
 export default function Shows() {
   const [popularShows, setPopularShows] = useState([]);
   const [trendingShows, setTrendingShows] = useState([]);
   const [topRatedShows, setTopRatedShows] = useState([]);
   const [onTheAirShows, setOnTheAirShows] = useState([]);
+  const [recentlyWatchedShows, setRecentlyWatchedShows] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,6 +29,10 @@ export default function Shows() {
         setTrendingShows(trending);
         setTopRatedShows(topRated);
         setOnTheAirShows(onTheAir);
+        
+        // Load recently watched shows from localStorage
+        const recentlyWatched = getRecentlyWatchedShows();
+        setRecentlyWatchedShows(recentlyWatched);
       } catch (error) {
         console.error('Error fetching shows:', error);
       } finally {
@@ -35,6 +42,10 @@ export default function Shows() {
 
     fetchShows();
   }, []);
+
+  const handleRemoveFromRecentlyWatched = (showId) => {
+    setRecentlyWatchedShows(prev => prev.filter(show => show.id !== showId));
+  };
 
   if (loading) {
     return (
@@ -61,6 +72,19 @@ export default function Shows() {
               Discover award-winning series, binge-worthy dramas, and trending shows.
             </p>
           </div>
+
+          {recentlyWatchedShows.length > 0 && (
+            <ContentRow title="Continue Watching">
+              {recentlyWatchedShows.map((show) => (
+                <div key={show.id} className="flex-none w-80">
+                  <RecentlyWatchedCard 
+                    data={show} 
+                    onRemove={handleRemoveFromRecentlyWatched}
+                  />
+                </div>
+              ))}
+            </ContentRow>
+          )}
 
           {trendingShows.length > 0 && (
             <ContentRow title="Trending Now">
