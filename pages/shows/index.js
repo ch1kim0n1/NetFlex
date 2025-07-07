@@ -10,6 +10,7 @@ import GenreSelector from "../../components/ui/GenreSelector";
 import { getPopularShows, getTrendingShows, getTopRatedShows, getOnTheAirShows, getGenres, getShowsByGenre } from "../../src/handlers/shows";
 import { getRecentlyWatchedShows } from "../../src/utils/viewingHistory";
 import { FaArrowLeft } from 'react-icons/fa';
+import ProtectedRoute from '../../components/auth/ProtectedRoute';
 
 export default function Shows() {
   const router = useRouter();
@@ -85,7 +86,7 @@ export default function Shows() {
   }
 
   return (
-    <>
+    <ProtectedRoute requireAuth={true}>
       <Head>
         <title>TV Shows - NetFlex</title>
         <meta name="description" content="Discover the best TV shows on NetFlex. From trending series to critically acclaimed dramas." />
@@ -182,6 +183,6 @@ export default function Shows() {
           )}
         </div>
       </MainLayout>
-    </>
+    </ProtectedRoute>
   );
 } 

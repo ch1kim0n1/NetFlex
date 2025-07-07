@@ -1,0 +1,44 @@
+{
+  "ratings": [
+    {
+      "id": "rating_001",
+      "userId": "admin_001",
+      "profileId": "profile_001",
+      "contentId": "550",
+      "contentType": "movie",
+      "rating": 5,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "rating_002",
+      "userId": "demo_001",
+      "profileId": "profile_003",
+      "contentId": "1399",
+      "contentType": "show",
+      "rating": 4,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "rating_1751873597554",
+      "userId": "admin_001",
+      "profileId": "profile_001",
+      "contentId": "803796",
+      "contentType": "movie",
+      "rating": 5,
+      "createdAt": "2025-07-07T07:33:17.554Z",
+      "updatedAt": "2025-07-07T07:33:17.554Z"
+    },
+    {
+      "id": "rating_1751874175447",
+      "userId": "demo_001",
+      "profileId": "profile_003",
+      "contentId": "803796",
+      "contentType": "movie",
+      "rating": 3,
+      "createdAt": "2025-07-07T07:42:55.447Z",
+      "updatedAt": "2025-07-07T07:42:55.447Z"
+    }
+  ]
+}

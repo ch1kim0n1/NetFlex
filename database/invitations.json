@@ -1,0 +1,46 @@
+{
+  "invitations": [
+    {
+      "id": "invite_001",
+      "userId": "admin_001",
+      "profileId": "profile_001",
+      "contentId": "550",
+      "contentType": "movie",
+      "inviteCode": "MOVIE_550_ADMIN",
+      "message": "Check out this amazing movie I just watched!",
+      "expiresAt": "2024-12-31T23:59:59.000Z",
+      "maxUses": 10,
+      "currentUses": 2,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "invite_002",
+      "userId": "demo_001",
+      "profileId": "profile_003",
+      "contentId": "1399",
+      "contentType": "show",
+      "inviteCode": "SHOW_1399_DEMO",
+      "message": "You have to watch this series! It's incredible.",
+      "expiresAt": "2024-12-31T23:59:59.000Z",
+      "maxUses": 5,
+      "currentUses": 0,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "invite_1751873684561",
+      "userId": "admin_001",
+      "profileId": "profile_001",
+      "contentId": "803796",
+      "contentType": "movie",
+      "inviteCode": "MOVIE_803796_admin_001_1751873684561",
+      "message": "Check out KPop Demon Hunters! I think you'll love it.",
+      "expiresAt": "2025-08-06T07:34:44.561Z",
+      "maxUses": 10,
+      "currentUses": 0,
+      "isActive": true,
+      "createdAt": "2025-07-07T07:34:44.561Z"
+    }
+  ]
+}

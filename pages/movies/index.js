@@ -7,16 +7,16 @@ import MovieCard from "../../components/movies/MovieCard";
 import RecentlyWatchedCard from "../../components/ui/RecentlyWatchedCard";
 import ParticleBackground from "../../components/ui/ParticleBackground";
 import GenreSelector from "../../components/ui/GenreSelector";
-import { getPopularMovies, getTrendingMovies, getTopRatedMovies, getUpcomingMovies, getNowPlayingMovies, getMovieGenres, getMoviesByGenre } from "../../src/handlers/movies";
+import { getPopularMovies, getTrendingMovies, getTopRatedMovies, getNowPlayingMovies, getMovieGenres, getMoviesByGenre } from "../../src/handlers/movies";
 import { getRecentlyWatchedMovies } from "../../src/utils/viewingHistory";
 import { FaArrowLeft } from 'react-icons/fa';
+import ProtectedRoute from '../../components/auth/ProtectedRoute';
 
 export default function Movies() {
   const router = useRouter();
   const [popularMovies, setPopularMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [topRatedMovies, setTopRatedMovies] = useState([]);
-  const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
   const [recentlyWatchedMovies, setRecentlyWatchedMovies] = useState([]);
   const [genres, setGenres] = useState([]);
@@ -27,11 +27,10 @@ export default function Movies() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const [popular, trending, topRated, upcoming, nowPlaying, movieGenres] = await Promise.all([
+        const [popular, trending, topRated, nowPlaying, movieGenres] = await Promise.all([
           getPopularMovies(20),
           getTrendingMovies(20),
           getTopRatedMovies(20),
-          getUpcomingMovies(20),
           getNowPlayingMovies(20),
           getMovieGenres()
         ]);
@@ -39,7 +38,6 @@ export default function Movies() {
         setPopularMovies(popular);
         setTrendingMovies(trending);
         setTopRatedMovies(topRated);
-        setUpcomingMovies(upcoming);
         setNowPlayingMovies(nowPlaying);
         setGenres(movieGenres);
         
@@ -88,49 +86,39 @@ export default function Movies() {
   }
 
   return (
-    <>
+    <ProtectedRoute>
       <Head>
         <title>Movies - NetFlex</title>
-        <meta name="description" content="Watch the latest movies on NetFlex. From blockbuster hits to indie films." />
+        <meta name="description" content="Explore trending and popular movies on NetFlex" />
       </Head>
-      
+
       <MainLayout showBrowseButtons={true}>
         <ParticleBackground />
-        <div className="pt-8 space-y-8 relative z-10">
-          <div className="px-8">
-            <div className="mb-6">
-              <button 
-                onClick={() => router.push('/')}
-                className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
-              >
-                <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
-                <span>Back to Home</span>
-              </button>
-            </div>
-            
-            <h1 className="text-4xl font-bold text-netflix-white mb-4">Movies</h1>
-            <p className="text-netflix-text-gray text-lg">
-              From blockbuster hits to indie gems, discover your next favorite movie.
-            </p>
+        <div className="px-8 py-8">
+          {/* Back Button */}
+          <div className="max-w-7xl mx-auto mb-6">
+            <button 
+              onClick={() => router.back()}
+              className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
+            >
+              <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
+              <span>Back</span>
+            </button>
           </div>
 
-          <GenreSelector 
-            genres={genres}
-            selectedGenre={selectedGenre}
-            onGenreSelect={setSelectedGenre}
-            type="movie"
-          />
+          <h1 className="text-4xl font-bold text-netflix-white mb-8 text-center">Movies</h1>
+          
+          {/* Genre Selector */}
+          <div className="max-w-7xl mx-auto mb-8">
+            <GenreSelector
+              genres={genres}
+              selectedGenre={selectedGenre}
+              onGenreChange={setSelectedGenre}
+              type="movie"
+            />
+          </div>
 
-          {selectedGenre && genreMovies.length > 0 && (
-            <ContentRow title={`${genres.find(g => g.id === selectedGenre)?.name || 'Genre'} Movies`}>
-              {genreMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-60">
-                  <MovieCard data={movie} />
-                </div>
-              ))}
-            </ContentRow>
-          )}
-
+          {/* Recently Watched Movies */}
           {recentlyWatchedMovies.length > 0 && (
             <ContentRow title="Continue Watching">
               {recentlyWatchedMovies.map((movie) => (
@@ -144,9 +132,10 @@ export default function Movies() {
             </ContentRow>
           )}
 
-          {trendingMovies.length > 0 && (
-            <ContentRow title="Trending Movies">
-              {trendingMovies.map((movie) => (
+          {/* Genre Movies */}
+          {selectedGenre && genreMovies.length > 0 && (
+            <ContentRow title={`${genres.find(g => g.id === selectedGenre)?.name} Movies`}>
+              {genreMovies.map((movie) => (
                 <div key={movie.id} className="flex-none w-60">
                   <MovieCard data={movie} />
                 </div>
@@ -154,16 +143,7 @@ export default function Movies() {
             </ContentRow>
           )}
 
-          {nowPlayingMovies.length > 0 && (
-            <ContentRow title="Now Playing">
-              {nowPlayingMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-60">
-                  <MovieCard data={movie} />
-                </div>
-              ))}
-            </ContentRow>
-          )}
-
+          {/* Popular Movies */}
           {popularMovies.length > 0 && (
             <ContentRow title="Popular Movies">
               {popularMovies.map((movie) => (
@@ -174,6 +154,18 @@ export default function Movies() {
             </ContentRow>
           )}
 
+          {/* Trending Movies */}
+          {trendingMovies.length > 0 && (
+            <ContentRow title="Trending Now">
+              {trendingMovies.map((movie) => (
+                <div key={movie.id} className="flex-none w-60">
+                  <MovieCard data={movie} />
+                </div>
+              ))}
+            </ContentRow>
+          )}
+
+          {/* Top Rated Movies */}
           {topRatedMovies.length > 0 && (
             <ContentRow title="Top Rated">
               {topRatedMovies.map((movie) => (
@@ -184,9 +176,10 @@ export default function Movies() {
             </ContentRow>
           )}
 
-          {upcomingMovies.length > 0 && (
-            <ContentRow title="Coming Soon">
-              {upcomingMovies.map((movie) => (
+          {/* Now Playing Movies */}
+          {nowPlayingMovies.length > 0 && (
+            <ContentRow title="Now Playing">
+              {nowPlayingMovies.map((movie) => (
                 <div key={movie.id} className="flex-none w-60">
                   <MovieCard data={movie} />
                 </div>
@@ -195,6 +188,6 @@ export default function Movies() {
           )}
         </div>
       </MainLayout>
-    </>
+    </ProtectedRoute>
   );
 } 

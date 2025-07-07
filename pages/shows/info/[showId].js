@@ -7,6 +7,10 @@ import MainLayout from "../../../components/ui/MainLayout";
 import ParticleBackground from "../../../components/ui/ParticleBackground";
 import { getShowDetails, getShowEpisodes, getShowSeasons } from "../../../src/handlers/shows";
 import { FaPlay, FaChevronDown, FaArrowLeft } from 'react-icons/fa';
+import RatingComponent from "../../../components/social/RatingComponent";
+import ReviewsSection from "../../../components/social/ReviewsSection";
+import InvitationComponent from "../../../components/social/InvitationComponent";
+import SeasonEpisodeSelector from "../../../components/shows/SeasonEpisodeSelector";
 
 function ShowDetailsPage() {
   const router = useRouter();
@@ -80,27 +84,59 @@ function ShowDetailsPage() {
     );
   }
 
+  const handleWatchShow = (season = 1, episode = 1) => {
+    router.push(`/shows/watch/${showId}/${season}/${episode}`);
+  };
+
+  const showTitle = showData.title.english || showData.title.original;
+  const backdropImage = showData.bannerImage || showData.image;
+
   return (
     <>
       <Head>
-        <title>{showData.title.english || showData.title.original} - NetFlex</title>
+        <title>{showTitle} - NetFlex</title>
         <meta name="description" content={showData.description} />
         <meta
           property="og:title"
-          content={`Watch ${showData.title.english || showData.title.original} - NetFlex`}
+          content={`Watch ${showTitle} - NetFlex`}
         />
         <meta property="og:description" content={showData.description} />
         <meta property="og:image" content={showData.bannerImage} />
       </Head>
 
-      <MainLayout useHead={false} banner={showData.bannerImage} type="shows" showBrowseButtons={true}>
+      {/* Fading Background Image */}
+      <div className="fixed inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-700 ease-in-out"
+          style={{ 
+            backgroundImage: `url('${backdropImage}')`,
+            filter: 'blur(1px)'
+          }}
+        />
+        {/* Black and white poster overlay for epic effect */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 transition-all duration-1000 ease-in-out"
+          style={{ 
+            backgroundImage: `url('${showData.image}')`,
+            filter: 'grayscale(100%) blur(2px)',
+            backgroundSize: '150% 150%',
+            backgroundPosition: 'center right'
+          }}
+        />
+        {/* Dark overlay gradients for readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-netflix-black via-netflix-black/90 to-netflix-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-netflix-black via-netflix-black/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-netflix-black/30 via-transparent to-netflix-black" />
+      </div>
+
+      <MainLayout useHead={false} type="shows" showBrowseButtons={true}>
         <ParticleBackground />
-        <div className="px-8 py-8 relative z-10">
+        <div className="px-8 py-8 relative z-10 min-h-screen">
           {/* Back Button */}
           <div className="max-w-6xl mx-auto mb-6">
             <button 
               onClick={() => router.back()}
-              className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
+              className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group bg-netflix-black/50 backdrop-blur-sm rounded-lg px-4 py-2"
             >
               <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
               <span>Back</span>
@@ -108,43 +144,49 @@ function ShowDetailsPage() {
           </div>
           
           {/* Show Details */}
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto space-y-12">
             <div className="grid md:grid-cols-3 gap-8">
               {/* Poster */}
               <div className="md:col-span-1">
                 <img
                   src={showData.image}
-                  alt={showData.title.english || showData.title.original}
-                  className="w-full rounded-lg shadow-lg"
+                  alt={showTitle}
+                  className="w-full rounded-lg shadow-2xl ring-1 ring-white/10 transition-transform duration-300 hover:scale-105"
                 />
               </div>
 
               {/* Details */}
               <div className="md:col-span-2 space-y-6">
-                <div>
-                  <h1 className="text-4xl font-bold text-netflix-white mb-4">
-                    {showData.title.english || showData.title.original}
+                <div className="bg-netflix-black/30 backdrop-blur-md rounded-xl p-8 border border-white/10">
+                  <h1 className="text-4xl font-bold text-netflix-white mb-4 text-shadow-lg">
+                    {showTitle}
                   </h1>
                   
                   <div className="flex items-center space-x-4 text-netflix-text-gray mb-4">
                     {showData.rating && (
-                      <span className="flex items-center space-x-1">
+                      <span className="flex items-center space-x-1 bg-netflix-red/20 px-3 py-1 rounded-full">
                         <span className="text-netflix-red">★</span>
-                        <span>{showData.rating.toFixed(1)}</span>
+                        <span className="text-netflix-white font-medium">{showData.rating.toFixed(1)}</span>
                       </span>
                     )}
-                    {showData.releaseDate && (
-                      <span>{new Date(showData.releaseDate).getFullYear()}</span>
+                    {showData.firstAirDate && (
+                      <span className="bg-netflix-gray/30 px-3 py-1 rounded-full text-netflix-white">
+                        {new Date(showData.firstAirDate).getFullYear()}
+                      </span>
                     )}
-                    {showData.seasons && (
-                      <span>{showData.seasons} {showData.seasons === 1 ? 'Season' : 'Seasons'}</span>
+                    {showData.numberOfSeasons && (
+                      <span className="bg-netflix-gray/30 px-3 py-1 rounded-full text-netflix-white">
+                        {showData.numberOfSeasons} Season{showData.numberOfSeasons > 1 ? 's' : ''}
+                      </span>
                     )}
-                    {showData.totalEpisodes && (
-                      <span>{showData.totalEpisodes} Episodes</span>
+                    {showData.numberOfEpisodes && (
+                      <span className="bg-netflix-gray/30 px-3 py-1 rounded-full text-netflix-white">
+                        {showData.numberOfEpisodes} Episodes
+                      </span>
                     )}
                   </div>
 
-                  <p className="text-netflix-text-gray text-lg leading-relaxed mb-6">
+                  <p className="text-netflix-text-gray text-lg leading-relaxed mb-6 text-shadow">
                     {showData.description}
                   </p>
 
@@ -155,7 +197,7 @@ function ShowDetailsPage() {
                         {showData.genres.map((genre) => (
                           <span
                             key={genre.id}
-                            className="px-3 py-1 bg-netflix-gray/30 text-netflix-text-gray rounded-full text-sm"
+                            className="px-3 py-1 bg-netflix-gray/40 border border-netflix-gray/30 text-netflix-white rounded-full text-sm backdrop-blur-sm"
                           >
                             {genre.name}
                           </span>
@@ -165,13 +207,13 @@ function ShowDetailsPage() {
                   )}
 
                   {showData.networks && showData.networks.length > 0 && (
-                    <div>
+                    <div className="mb-6">
                       <h3 className="text-netflix-white font-semibold mb-2">Networks</h3>
                       <div className="flex flex-wrap gap-2">
-                        {showData.networks.map((network) => (
+                        {showData.networks.slice(0, 3).map((network) => (
                           <span
                             key={network.id}
-                            className="px-3 py-1 bg-netflix-red/20 text-netflix-white rounded-full text-sm"
+                            className="px-3 py-1 bg-netflix-red/30 border border-netflix-red/30 text-netflix-white rounded-full text-sm backdrop-blur-sm"
                           >
                             {network.name}
                           </span>
@@ -179,97 +221,71 @@ function ShowDetailsPage() {
                       </div>
                     </div>
                   )}
-                </div>
 
-                <button 
-                  onClick={handleWatchNow}
-                  className="bg-netflix-red hover:bg-netflix-red-dark text-netflix-white font-semibold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105"
-                >
-                  ▶ Watch Now
-                </button>
+                  {showData.status && (
+                    <div className="text-sm bg-netflix-gray/20 rounded-lg p-4">
+                      <span className="text-netflix-text-gray">Status:</span>
+                      <span className="text-netflix-white ml-2 font-medium">{showData.status}</span>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center space-x-4 mt-8">
+                    <button 
+                      onClick={handleWatchNow}
+                      className="bg-netflix-red hover:bg-netflix-red-dark text-netflix-white font-semibold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    >
+                      ▶ Watch Now
+                    </button>
+                    
+                    <InvitationComponent
+                      contentId={showId}
+                      contentType="show"
+                      contentTitle={showTitle}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Episodes */}
-            {(episodeData.length > 0 || seasons.length > 0) && (
-              <div className="mt-12">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-netflix-white">Episodes</h2>
-                  
-                  {/* Season Selector */}
-                  {seasons.length > 1 && (
-                    <div className="relative">
-                      <select
-                        value={selectedSeason}
-                        onChange={(e) => handleSeasonChange(parseInt(e.target.value))}
-                        disabled={episodesLoading}
-                        className="bg-netflix-gray text-netflix-white px-4 py-2 rounded-md border border-netflix-gray/50 focus:outline-none focus:ring-2 focus:ring-netflix-red disabled:opacity-50"
-                      >
-                        {seasons.map((season) => (
-                          <option key={season.seasonNumber} value={season.seasonNumber}>
-                            Season {season.seasonNumber}
-                            {season.name !== `Season ${season.seasonNumber}` && ` - ${season.name}`}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
+            {/* Episodes Section */}
+            <div className="bg-netflix-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10">
+              <SeasonEpisodeSelector
+                showId={showId}
+                seasons={seasons}
+                episodes={episodeData}
+                selectedSeason={selectedSeason}
+                onSeasonChange={handleSeasonChange}
+                onEpisodeWatch={handleWatchShow}
+                loading={episodesLoading}
+              />
+            </div>
+
+            {/* Social Features Section */}
+            <div className="border-t border-white/10 pt-12">
+              <div className="grid lg:grid-cols-3 gap-12">
+                {/* Ratings */}
+                <div className="lg:col-span-1">
+                  <div className="bg-netflix-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10">
+                    <h2 className="text-2xl font-bold text-netflix-white mb-6">Community Rating</h2>
+                    <RatingComponent
+                      contentId={showId}
+                      contentType="show"
+                    />
+                  </div>
                 </div>
 
-                {episodesLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-netflix-red mx-auto mb-2"></div>
-                    <p className="text-netflix-text-gray">Loading episodes...</p>
+                {/* Reviews */}
+                <div className="lg:col-span-2">
+                  <div className="bg-netflix-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10">
+                    <ReviewsSection
+                      contentId={showId}
+                      contentType="show"
+                    />
                   </div>
-                ) : (
-                  <div className="grid gap-4">
-                    {episodeData.map((episode) => (
-                      <Link 
-                        key={episode.id} 
-                        href={`/shows/watch/${showId}/${selectedSeason}/${episode.episodeNumber}`}
-                      >
-                        <div className="bg-netflix-gray/20 rounded-lg p-4 hover:bg-netflix-gray/30 transition-colors cursor-pointer group">
-                          <div className="flex items-start space-x-4">
-                            <div className="relative">
-                              {episode.image && (
-                                <img
-                                  src={episode.image}
-                                  alt={episode.title}
-                                  className="w-32 h-18 object-cover rounded"
-                                />
-                              )}
-                              {/* Play button overlay */}
-                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
-                                <FaPlay className="text-netflix-white text-xl" />
-                              </div>
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="text-netflix-white font-semibold group-hover:text-netflix-red transition-colors">
-                                {episode.episodeNumber}. {episode.title}
-                              </h3>
-                              {episode.overview && (
-                                <p className="text-netflix-text-gray text-sm mt-2 line-clamp-2">
-                                  {episode.overview}
-                                </p>
-                              )}
-                              <div className="flex items-center space-x-4 mt-2 text-xs text-netflix-text-gray">
-                                {episode.runtime && <span>{episode.runtime}m</span>}
-                                {episode.airDate && (
-                                  <span>{new Date(episode.airDate).toLocaleDateString()}</span>
-                                )}
-                                {episode.rating && (
-                                  <span>⭐ {episode.rating.toFixed(1)}</span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </MainLayout>

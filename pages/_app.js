@@ -6,6 +6,8 @@ import ReactGA from "react-ga";
 import { events } from "next/router";
 import nprogress from "nprogress";
 import GoogleAnalytics from "../components/GoogleAnalytics";
+import { AuthProvider } from '../src/contexts/AuthContext'
+import SecurityAlert from '../components/auth/SecurityAlert'
 
 if (process.env.NEXT_PUBLIC_GA_TRACKING_ID) {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -19,14 +21,15 @@ function MyApp({ Component, pageProps }) {
   const queryClient = new QueryClient();
 
   return (
-    <>
+    <AuthProvider>
       <QueryClientProvider client={queryClient}>
         {process.env.NEXT_PUBLIC_GA_TACKING_ID && (
           <GoogleAnalytics />
         )}
         <Component {...pageProps} />
+        <SecurityAlert />
       </QueryClientProvider>
-    </>
+    </AuthProvider>
   );
 }
 

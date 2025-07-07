@@ -9,6 +9,7 @@ import ParticleBackground from "../../components/ui/ParticleBackground";
 import { getTrendingShows } from "../../src/handlers/shows";
 import { getTrendingMovies } from "../../src/handlers/movies";
 import { FaArrowLeft } from 'react-icons/fa';
+import ProtectedRoute from '../../components/auth/ProtectedRoute';
 
 export default function Trending() {
   const router = useRouter();
@@ -47,7 +48,7 @@ export default function Trending() {
   }
 
   return (
-    <>
+    <ProtectedRoute requireAuth={true}>
       <Head>
         <title>Trending - NetFlex</title>
         <meta name="description" content="Discover what's trending on NetFlex. The hottest movies and TV shows everyone is watching." />
@@ -94,6 +95,6 @@ export default function Trending() {
           )}
         </div>
       </MainLayout>
-    </>
+    </ProtectedRoute>
   );
 } 

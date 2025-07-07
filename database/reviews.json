@@ -1,0 +1,49 @@
+{
+  "reviews": [
+    {
+      "id": "review_001",
+      "userId": "admin_001",
+      "profileId": "profile_001",
+      "contentId": "550",
+      "contentType": "movie",
+      "title": "Amazing cinematic experience!",
+      "content": "This movie completely blew me away. The storytelling, cinematography, and performances were all top-notch. Definitely a must-watch!",
+      "rating": 5,
+      "likes": 12,
+      "dislikes": 1,
+      "isSpam": false,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "review_002",
+      "userId": "demo_001",
+      "profileId": "profile_003",
+      "contentId": "1399",
+      "contentType": "show",
+      "title": "Great show, well written",
+      "content": "Really enjoying this series. The character development is excellent and each episode keeps you wanting more. Highly recommend!",
+      "rating": 4,
+      "likes": 8,
+      "dislikes": 0,
+      "isSpam": false,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "review_1751873630569",
+      "userId": "admin_001",
+      "profileId": "profile_001",
+      "contentId": "803796",
+      "contentType": "movie",
+      "title": "Amazing show",
+      "content": "this show is a true amazement, i love every part of it and i want another one like that",
+      "rating": 5,
+      "likes": 0,
+      "dislikes": 0,
+      "isSpam": false,
+      "createdAt": "2025-07-07T07:33:50.569Z",
+      "updatedAt": "2025-07-07T07:33:50.569Z"
+    }
+  ]
+}

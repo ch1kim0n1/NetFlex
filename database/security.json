@@ -1,0 +1,38 @@
+{
+  "loginHistory": [
+    {
+      "id": "login_1751874775674_7g3b5o",
+      "userId": "admin_001",
+      "timestamp": "2025-07-07T07:52:55.674Z",
+      "location": {
+        "city": "Tokyo",
+        "country": "Japan",
+        "lat": 35.6762,
+        "lon": 139.6503
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+      "ip": "unknown",
+      "isSuspicious": false
+    },
+    {
+      "id": "login_1751875309168_vdyc8n",
+      "userId": "admin_001",
+      "timestamp": "2025-07-07T08:01:49.168Z",
+      "location": {
+        "city": "Paris",
+        "country": "France",
+        "lat": 48.8566,
+        "lon": 2.3522
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+      "ip": "unknown",
+      "isSuspicious": true
+    }
+  ],
+  "flaggedAccounts": [],
+  "securitySettings": {
+    "maxLocationDistance": 500,
+    "timeWindowHours": 24,
+    "maxSuspiciousLogins": 3
+  }
+}

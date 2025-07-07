@@ -1,16 +1,24 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import { FaFilm, FaTv } from "react-icons/fa";
+import { FaFilm, FaTv, FaUser, FaCaretDown, FaSignOutAlt, FaUserShield } from "react-icons/fa";
 import { CgSearch } from "react-icons/cg";
 import Logo from "../ui/Logo";
 import SearchInput from "../ui/SearchInput";
+import AuthModal from "../auth/AuthModal";
+import ProfileSelector from "../auth/ProfileSelector";
+import { useAuth } from "../../src/contexts/AuthContext";
 import Link from "next/link";
 
 function Header({ bg = false, type, showBrowseButtons = false }) {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState('signin');
+  const [showProfileSelector, setShowProfileSelector] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const searchInputRef = useRef(null);
+  const { isAuthenticated, currentProfile, logout, user, isLoading, isAdmin, selectProfile } = useAuth();
 
   const isActivePage = (path) => {
     return router.pathname.startsWith(path);
@@ -29,12 +37,46 @@ function Header({ bg = false, type, showBrowseButtons = false }) {
   }, []);
 
   const handleSearchIconClick = () => {
-    setIsMenuOpen(true); // Open the search menu
+    setIsMenuOpen(true);
     setTimeout(() => {
-      // Ensure the menu is open before focusing
       searchInputRef.current.focusInput();
     }, 0);
   };
+
+  const handleSignIn = () => {
+    setAuthMode('signin');
+    setShowAuthModal(true);
+  };
+
+  const handleProfileChange = () => {
+    setShowProfileSelector(true);
+    setShowUserMenu(false);
+  };
+
+  const handleProfileSelect = (profile) => {
+    selectProfile(profile);
+    setShowProfileSelector(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setShowUserMenu(false);
+    router.push('/');
+  };
+
+  // Don't render auth buttons if still loading
+  if (isLoading) {
+    return (
+      <div className={`z-50 transition-all py-4 px-6 flex justify-between left-0 items-center top-0 right-0 ${bg === true ? "bg-gradient-to-b from-netflix-black/90 to-transparent" : "bg-netflix-black"} ${isScrolled ? `sticky top-0 bg-netflix-black/95 backdrop-filter backdrop-blur-lg shadow-lg` : ''}`}>
+        <div className="z-50 flex flex-row space-x-5">
+          <Logo />
+        </div>
+        <div className="flex justify-end items-center space-x-4">
+          <div className="w-8 h-8 bg-netflix-gray/30 rounded animate-pulse"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -44,8 +86,8 @@ function Header({ bg = false, type, showBrowseButtons = false }) {
         <div className="z-50 flex flex-row space-x-5">
           <Logo />
           
-          {/* Browse Navigation - White Buttons for Movies/Shows/Search pages */}
-          {showBrowseButtons && (
+          {/* Browse Navigation - Show only if authenticated */}
+          {isAuthenticated && showBrowseButtons && (
             <>
               {/* Desktop Browse Buttons */}
               <div className="hidden lg:flex my-auto space-x-3 ml-8">
@@ -102,8 +144,8 @@ function Header({ bg = false, type, showBrowseButtons = false }) {
             </>
           )}
 
-          {/* Default Navigation - Underline style for other pages */}
-          {!showBrowseButtons && (
+          {/* Default Navigation - Show only if authenticated */}
+          {isAuthenticated && !showBrowseButtons && (
             <div className="hidden lg:flex my-auto text-sm font-medium text-netflix-white space-x-6 ml-8">
               <Link href={`/shows`}>
                 <button title="TV Shows" className="transition-all text-netflix-white hover:text-netflix-text-gray py-2 hover:underline underline-offset-4 decoration-2 decoration-netflix-red">
@@ -128,14 +170,111 @@ function Header({ bg = false, type, showBrowseButtons = false }) {
             </div>
           )}
         </div>
+
         <div className={`flex justify-end items-center space-x-4`}>
-          <div onClick={handleSearchIconClick} className={`${bg === true ? "hidden" : ""} transition-all text-netflix-white hover:text-netflix-text-gray p-2 hover:cursor-pointer flex items-center space-x-2`}>
-            <CgSearch className="text-xl" />
-            <span className="hidden md:inline text-sm">Quick Search</span>
-          </div>
+          {/* Search Icon - Show only if authenticated */}
+          {isAuthenticated && (
+            <div onClick={handleSearchIconClick} className={`${bg === true ? "hidden" : ""} transition-all text-netflix-white hover:text-netflix-text-gray p-2 hover:cursor-pointer flex items-center space-x-2`}>
+              <CgSearch className="text-xl" />
+              <span className="hidden md:inline text-sm">Quick Search</span>
+            </div>
+          )}
+
+          {/* Authentication Section */}
+          {!isAuthenticated ? (
+            /* Guest User - Show Sign In button only */
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleSignIn}
+                className="px-4 py-2 bg-netflix-red hover:bg-netflix-red/80 text-netflix-white rounded-md transition-colors font-medium"
+              >
+                Sign In
+              </button>
+            </div>
+          ) : (
+            /* Authenticated User - Show Profile */
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center space-x-2 p-2 rounded-lg hover:bg-netflix-gray/20 transition-colors"
+              >
+                {currentProfile ? (
+                  <>
+                    <img
+                      src={currentProfile.avatar}
+                      alt={currentProfile.name}
+                      className="w-8 h-8 rounded object-cover"
+                    />
+                    <span className="hidden md:inline text-netflix-white text-sm font-medium">
+                      {currentProfile.name}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-8 h-8 bg-netflix-red rounded flex items-center justify-center">
+                      <FaUser className="text-netflix-white text-sm" />
+                    </div>
+                    <span className="hidden md:inline text-netflix-white text-sm font-medium">
+                      {user.firstName}
+                    </span>
+                  </>
+                )}
+                <FaCaretDown className="text-netflix-text-gray text-sm" />
+              </button>
+
+              {/* User Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-netflix-black border border-netflix-gray/30 rounded-lg shadow-2xl py-2 z-60">
+                  <div className="px-4 py-2 border-b border-netflix-gray/30">
+                    <p className="text-netflix-white text-sm font-medium">{user.firstName} {user.lastName}</p>
+                    <p className="text-netflix-text-gray text-xs">{user.email}</p>
+                    {isAdmin && (
+                      <p className="text-netflix-red text-xs font-medium mt-1">ADMIN</p>
+                    )}
+                  </div>
+                  
+                  {isAdmin && (
+                    <>
+                      <Link href="/admin/dashboard">
+                        <button className="w-full text-left px-4 py-2 text-netflix-white hover:bg-netflix-gray/20 transition-colors flex items-center space-x-2">
+                          <FaUserShield className="text-sm text-netflix-red" />
+                          <span>Admin Dashboard</span>
+                        </button>
+                      </Link>
+                      <div className="border-b border-netflix-gray/30 my-2"></div>
+                    </>
+                  )}
+                  
+                  <button
+                    onClick={handleProfileChange}
+                    className="w-full text-left px-4 py-2 text-netflix-white hover:bg-netflix-gray/20 transition-colors"
+                  >
+                    Switch Profile
+                  </button>
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-netflix-white hover:bg-netflix-gray/20 transition-colors flex items-center space-x-2"
+                  >
+                    <FaSignOutAlt className="text-sm" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Close user menu when clicking outside */}
+      {showUserMenu && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setShowUserMenu(false)}
+        />
+      )}
+
+      {/* Search Modal */}
       <div
         onClick={() => setIsMenuOpen(false)}
         className={`transition-all fixed ${isMenuOpen ? "z-30 top-0 left-0 right-0 bottom-0 bg-black bg-opacity-80" : ""} w-screen h-screen`}
@@ -149,6 +288,24 @@ function Header({ bg = false, type, showBrowseButtons = false }) {
           <SearchInput ref={searchInputRef} type={type} />
         </div>
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode={authMode}
+        onShowProfileSelector={() => {
+          setShowAuthModal(false);
+          setTimeout(() => setShowProfileSelector(true), 100);
+        }}
+      />
+
+      {/* Profile Selector */}
+              <ProfileSelector
+          isOpen={showProfileSelector}
+          onClose={() => setShowProfileSelector(false)}
+          onProfileSelect={handleProfileSelect}
+        />
     </>
   );
 }

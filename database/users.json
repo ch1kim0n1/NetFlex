@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "id": "admin_001",
+      "email": "admin@netflex.com",
+      "password": "admin123",
+      "firstName": "Admin",
+      "lastName": "User",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "lastLogin": "2025-07-07T08:01:49.151Z",
+      "accountType": "premium",
+      "isActive": true,
+      "isAdmin": true
+    },
+    {
+      "id": "demo_001",
+      "email": "demo@netflex.com",
+      "password": "demo123",
+      "firstName": "Demo",
+      "lastName": "User",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "lastLogin": "2025-07-07T07:42:24.557Z",
+      "accountType": "standard",
+      "isActive": true,
+      "isAdmin": false
+    }
+  ]
+}
