@@ -4,7 +4,9 @@ import MainLayout from "../../components/ui/MainLayout";
 import ContentRow from "../../components/ui/ContentRow";
 import MovieCard from "../../components/movies/MovieCard";
 import RecentlyWatchedCard from "../../components/ui/RecentlyWatchedCard";
-import { getPopularMovies, getTrendingMovies, getTopRatedMovies, getUpcomingMovies, getNowPlayingMovies } from "../../src/handlers/movies";
+import ParticleBackground from "../../components/ui/ParticleBackground";
+import GenreSelector from "../../components/ui/GenreSelector";
+import { getPopularMovies, getTrendingMovies, getTopRatedMovies, getUpcomingMovies, getNowPlayingMovies, getMovieGenres, getMoviesByGenre } from "../../src/handlers/movies";
 import { getRecentlyWatchedMovies } from "../../src/utils/viewingHistory";
 
 export default function Movies() {
@@ -14,17 +16,21 @@ export default function Movies() {
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
   const [recentlyWatchedMovies, setRecentlyWatchedMovies] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState(null);
+  const [genreMovies, setGenreMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const [popular, trending, topRated, upcoming, nowPlaying] = await Promise.all([
+        const [popular, trending, topRated, upcoming, nowPlaying, movieGenres] = await Promise.all([
           getPopularMovies(20),
           getTrendingMovies(20),
           getTopRatedMovies(20),
           getUpcomingMovies(20),
-          getNowPlayingMovies(20)
+          getNowPlayingMovies(20),
+          getMovieGenres()
         ]);
         
         setPopularMovies(popular);
@@ -32,6 +38,7 @@ export default function Movies() {
         setTopRatedMovies(topRated);
         setUpcomingMovies(upcoming);
         setNowPlayingMovies(nowPlaying);
+        setGenres(movieGenres);
         
         // Load recently watched movies from localStorage
         const recentlyWatched = getRecentlyWatchedMovies();
@@ -45,6 +52,23 @@ export default function Movies() {
 
     fetchMovies();
   }, []);
+
+  useEffect(() => {
+    const fetchGenreMovies = async () => {
+      if (selectedGenre) {
+        try {
+          const movies = await getMoviesByGenre(selectedGenre, 20);
+          setGenreMovies(movies);
+        } catch (error) {
+          console.error('Error fetching movies by genre:', error);
+        }
+      } else {
+        setGenreMovies([]);
+      }
+    };
+
+    fetchGenreMovies();
+  }, [selectedGenre]);
 
   const handleRemoveFromRecentlyWatched = (movieId) => {
     setRecentlyWatchedMovies(prev => prev.filter(movie => movie.id !== movieId));
@@ -67,14 +91,32 @@ export default function Movies() {
         <meta name="description" content="Watch the latest movies on NetFlex. From blockbuster hits to indie films." />
       </Head>
       
-      <MainLayout>
-        <div className="pt-8 space-y-8">
+      <MainLayout showBrowseButtons={true}>
+        <ParticleBackground />
+        <div className="pt-8 space-y-8 relative z-10">
           <div className="px-6">
             <h1 className="text-4xl font-bold text-netflix-white mb-4">Movies</h1>
             <p className="text-netflix-text-gray text-lg">
               From blockbuster hits to indie gems, discover your next favorite movie.
             </p>
           </div>
+
+          <GenreSelector 
+            genres={genres}
+            selectedGenre={selectedGenre}
+            onGenreSelect={setSelectedGenre}
+            type="movie"
+          />
+
+          {selectedGenre && genreMovies.length > 0 && (
+            <ContentRow title={`${genres.find(g => g.id === selectedGenre)?.name || 'Genre'} Movies`}>
+              {genreMovies.map((movie) => (
+                <div key={movie.id} className="flex-none w-60">
+                  <MovieCard data={movie} />
+                </div>
+              ))}
+            </ContentRow>
+          )}
 
           {recentlyWatchedMovies.length > 0 && (
             <ContentRow title="Continue Watching">

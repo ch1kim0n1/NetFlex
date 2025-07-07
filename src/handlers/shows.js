@@ -194,6 +194,40 @@ export const getShowSeasons = async (id) => {
   }
 };
 
+export const getGenres = async () => {
+  try {
+    const response = await fetch(`${baseUrl}/genre/tv/list?api_key=${apiKey}&language=en-US`);
+    const data = await response.json();
+    return data.genres || [];
+  } catch (error) {
+    console.error('Error fetching TV genres:', error);
+    return [];
+  }
+};
+
+export const getShowsByGenre = async (genreId, count = 20) => {
+  try {
+    const response = await fetch(`${baseUrl}/discover/tv?api_key=${apiKey}&language=en-US&with_genres=${genreId}&page=1`);
+    const data = await response.json();
+    return data.results?.slice(0, count).map(show => ({
+      id: show.id,
+      title: {
+        english: show.name,
+        original: show.original_name,
+      },
+      image: `${imageBaseUrl}${show.poster_path}`,
+      bannerImage: `${imageBaseUrl}${show.backdrop_path}`,
+      description: show.overview,
+      rating: show.vote_average,
+      releaseDate: show.first_air_date,
+      genres: show.genre_ids,
+    })) || [];
+  } catch (error) {
+    console.error('Error fetching shows by genre:', error);
+    return [];
+  }
+};
+
 export const searchShows = async (query, count = 20) => {
   try {
     const response = await fetch(`${baseUrl}/search/tv?api_key=${apiKey}&language=en-US&query=${encodeURIComponent(query)}&page=1`);

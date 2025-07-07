@@ -4,6 +4,7 @@ import MainLayout from "../../components/ui/MainLayout";
 import ContentRow from "../../components/ui/ContentRow";
 import ShowCard from "../../components/shows/ShowCard";
 import MovieCard from "../../components/movies/MovieCard";
+import ParticleBackground from "../../components/ui/ParticleBackground";
 import { getTrendingShows } from "../../src/handlers/shows";
 import { getTrendingMovies } from "../../src/handlers/movies";
 
@@ -49,8 +50,9 @@ export default function Trending() {
         <meta name="description" content="Discover what's trending on NetFlex. The hottest movies and TV shows everyone is watching." />
       </Head>
       
-      <MainLayout>
-        <div className="pt-8 space-y-8">
+      <MainLayout showBrowseButtons={true}>
+        <ParticleBackground />
+        <div className="pt-8 space-y-8 relative z-10">
           <div className="px-6">
             <h1 className="text-4xl font-bold text-netflix-white mb-4">Trending Now</h1>
             <p className="text-netflix-text-gray text-lg">

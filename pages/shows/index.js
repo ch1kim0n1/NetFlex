@@ -4,7 +4,9 @@ import MainLayout from "../../components/ui/MainLayout";
 import ContentRow from "../../components/ui/ContentRow";
 import ShowCard from "../../components/shows/ShowCard";
 import RecentlyWatchedCard from "../../components/ui/RecentlyWatchedCard";
-import { getPopularShows, getTrendingShows, getTopRatedShows, getOnTheAirShows } from "../../src/handlers/shows";
+import ParticleBackground from "../../components/ui/ParticleBackground";
+import GenreSelector from "../../components/ui/GenreSelector";
+import { getPopularShows, getTrendingShows, getTopRatedShows, getOnTheAirShows, getGenres, getShowsByGenre } from "../../src/handlers/shows";
 import { getRecentlyWatchedShows } from "../../src/utils/viewingHistory";
 
 export default function Shows() {
@@ -13,22 +15,27 @@ export default function Shows() {
   const [topRatedShows, setTopRatedShows] = useState([]);
   const [onTheAirShows, setOnTheAirShows] = useState([]);
   const [recentlyWatchedShows, setRecentlyWatchedShows] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState(null);
+  const [genreShows, setGenreShows] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchShows = async () => {
       try {
-        const [popular, trending, topRated, onTheAir] = await Promise.all([
+        const [popular, trending, topRated, onTheAir, showGenres] = await Promise.all([
           getPopularShows(20),
           getTrendingShows(20),
           getTopRatedShows(20),
-          getOnTheAirShows(20)
+          getOnTheAirShows(20),
+          getGenres()
         ]);
         
         setPopularShows(popular);
         setTrendingShows(trending);
         setTopRatedShows(topRated);
         setOnTheAirShows(onTheAir);
+        setGenres(showGenres);
         
         // Load recently watched shows from localStorage
         const recentlyWatched = getRecentlyWatchedShows();
@@ -42,6 +49,23 @@ export default function Shows() {
 
     fetchShows();
   }, []);
+
+  useEffect(() => {
+    const fetchGenreShows = async () => {
+      if (selectedGenre) {
+        try {
+          const shows = await getShowsByGenre(selectedGenre, 20);
+          setGenreShows(shows);
+        } catch (error) {
+          console.error('Error fetching shows by genre:', error);
+        }
+      } else {
+        setGenreShows([]);
+      }
+    };
+
+    fetchGenreShows();
+  }, [selectedGenre]);
 
   const handleRemoveFromRecentlyWatched = (showId) => {
     setRecentlyWatchedShows(prev => prev.filter(show => show.id !== showId));
@@ -64,14 +88,32 @@ export default function Shows() {
         <meta name="description" content="Discover the best TV shows on NetFlex. From trending series to critically acclaimed dramas." />
       </Head>
       
-      <MainLayout>
-        <div className="pt-8 space-y-8">
+      <MainLayout showBrowseButtons={true}>
+        <ParticleBackground />
+        <div className="pt-8 space-y-8 relative z-10">
           <div className="px-6">
             <h1 className="text-4xl font-bold text-netflix-white mb-4">TV Shows</h1>
             <p className="text-netflix-text-gray text-lg">
               Discover award-winning series, binge-worthy dramas, and trending shows.
             </p>
           </div>
+
+          <GenreSelector 
+            genres={genres}
+            selectedGenre={selectedGenre}
+            onGenreSelect={setSelectedGenre}
+            type="show"
+          />
+
+          {selectedGenre && genreShows.length > 0 && (
+            <ContentRow title={`${genres.find(g => g.id === selectedGenre)?.name || 'Genre'} Shows`}>
+              {genreShows.map((show) => (
+                <div key={show.id} className="flex-none w-60">
+                  <ShowCard data={show} />
+                </div>
+              ))}
+            </ContentRow>
+          )}
 
           {recentlyWatchedShows.length > 0 && (
             <ContentRow title="Continue Watching">

@@ -2,7 +2,7 @@ import Head from "next/head";
 import Footer from "./Footer";
 import Header from "./Header";
 
-function MainLayout({ children, useHead = true, banner, search = true, landing = false, type }) {
+function MainLayout({ children, useHead = true, banner, search = true, landing = false, type, showBrowseButtons = false }) {
   return (
     <div className="bg-netflix-black min-h-screen">
       {useHead && (
@@ -37,7 +37,7 @@ function MainLayout({ children, useHead = true, banner, search = true, landing =
         </Head>
       )}
 
-      <Header search={search} bg={landing} type={type} />
+      <Header search={search} bg={landing} type={type} showBrowseButtons={showBrowseButtons} />
       {banner && (
         <div className="pt-3 relative max-lg:hidden">
           <img src={banner} className="w-full h-96 object-cover" />

@@ -30,7 +30,7 @@ function MovieDetailsPage() {
 
   if (loading) {
     return (
-      <MainLayout>
+      <MainLayout showBrowseButtons={true}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-netflix-white text-xl">Loading Movie Details...</div>
         </div>
@@ -40,7 +40,7 @@ function MovieDetailsPage() {
 
   if (!movieData) {
     return (
-      <MainLayout>
+      <MainLayout showBrowseButtons={true}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-netflix-white text-xl">Movie not found</div>
         </div>
@@ -80,7 +80,7 @@ function MovieDetailsPage() {
         <meta property="og:image" content={movieData.bannerImage} />
       </Head>
 
-      <MainLayout useHead={false} banner={movieData.bannerImage} type="movies">
+      <MainLayout useHead={false} banner={movieData.bannerImage} type="movies" showBrowseButtons={true}>
         <div className="px-6 py-8">
           {/* Movie Details */}
           <div className="max-w-6xl mx-auto">

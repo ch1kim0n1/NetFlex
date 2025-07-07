@@ -55,7 +55,7 @@ function WatchMovie() {
 
   if (loading) {
     return (
-      <MainLayout>
+      <MainLayout showBrowseButtons={true}>
         <Head>
           <title>Loading Movie - NetFlex</title>
         </Head>
@@ -71,7 +71,7 @@ function WatchMovie() {
 
   if (error || !movie) {
     return (
-      <MainLayout>
+      <MainLayout showBrowseButtons={true}>
         <Head>
           <title>Movie Not Found - NetFlex</title>
         </Head>
@@ -91,7 +91,7 @@ function WatchMovie() {
   }
 
   return (
-    <MainLayout>
+    <MainLayout showBrowseButtons={true}>
       <Head>
         <title>{movie.title.english} - Watch on NetFlex</title>
         <meta name="description" content={`Watch ${movie.title.english} on NetFlex. ${movie.description}`} />

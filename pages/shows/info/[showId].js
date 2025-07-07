@@ -61,7 +61,7 @@ function ShowDetailsPage() {
 
   if (loading) {
     return (
-      <MainLayout>
+      <MainLayout showBrowseButtons={true}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-netflix-white text-xl">Loading Show Details...</div>
         </div>
@@ -71,7 +71,7 @@ function ShowDetailsPage() {
 
   if (!showData) {
     return (
-      <MainLayout>
+      <MainLayout showBrowseButtons={true}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-netflix-white text-xl">Show not found</div>
         </div>
@@ -92,7 +92,7 @@ function ShowDetailsPage() {
         <meta property="og:image" content={showData.bannerImage} />
       </Head>
 
-      <MainLayout useHead={false} banner={showData.bannerImage} type="shows">
+      <MainLayout useHead={false} banner={showData.bannerImage} type="shows" showBrowseButtons={true}>
         <div className="px-6 py-8">
           {/* Show Details */}
           <div className="max-w-6xl mx-auto">

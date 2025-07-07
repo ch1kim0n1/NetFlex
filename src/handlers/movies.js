@@ -161,6 +161,40 @@ export const getNowPlayingMovies = async (count = 20) => {
   }
 };
 
+export const getMovieGenres = async () => {
+  try {
+    const response = await fetch(`${baseUrl}/genre/movie/list?api_key=${apiKey}&language=en-US`);
+    const data = await response.json();
+    return data.genres || [];
+  } catch (error) {
+    console.error('Error fetching movie genres:', error);
+    return [];
+  }
+};
+
+export const getMoviesByGenre = async (genreId, count = 20) => {
+  try {
+    const response = await fetch(`${baseUrl}/discover/movie?api_key=${apiKey}&language=en-US&with_genres=${genreId}&page=1`);
+    const data = await response.json();
+    return data.results?.slice(0, count).map(movie => ({
+      id: movie.id,
+      title: {
+        english: movie.title,
+        original: movie.original_title,
+      },
+      image: `${imageBaseUrl}${movie.poster_path}`,
+      bannerImage: `${imageBaseUrl}${movie.backdrop_path}`,
+      description: movie.overview,
+      rating: movie.vote_average,
+      releaseDate: movie.release_date,
+      genres: movie.genre_ids,
+    })) || [];
+  } catch (error) {
+    console.error('Error fetching movies by genre:', error);
+    return [];
+  }
+};
+
 export const searchMovies = async (query, count = 20) => {
   try {
     const response = await fetch(`${baseUrl}/search/movie?api_key=${apiKey}&language=en-US&query=${encodeURIComponent(query)}&page=1`);

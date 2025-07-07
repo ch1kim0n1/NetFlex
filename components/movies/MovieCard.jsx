@@ -34,11 +34,7 @@ function MovieCard({ data }) {
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-netflix-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <FaPlay className="text-netflix-white text-lg" />
-                    <span className="text-netflix-white text-sm font-medium">Watch Now</span>
-                  </div>
+                <div className="flex items-center justify-end mb-2">
                   <Link href={`/movies/watch/${data.id}`}>
                     <button 
                       className="bg-netflix-red hover:bg-netflix-red-dark text-netflix-white px-3 py-1 rounded-full text-xs font-medium transition-colors"
