@@ -2,26 +2,33 @@ import Head from "next/head";
 import React from "react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import MainLayout from "../../../components/ui/MainLayout";
-import { getShowDetails, getShowEpisodes } from "../../../src/handlers/shows";
+import { getShowDetails, getShowEpisodes, getShowSeasons } from "../../../src/handlers/shows";
+import { FaPlay, FaChevronDown } from 'react-icons/fa';
 
 function ShowDetailsPage() {
   const router = useRouter();
   const { showId } = router.query;
   const [showData, setShowData] = useState(null);
   const [episodeData, setEpisodeData] = useState([]);
+  const [seasons, setSeasons] = useState([]);
+  const [selectedSeason, setSelectedSeason] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [episodesLoading, setEpisodesLoading] = useState(false);
 
   useEffect(() => {
     if (showId) {
       const fetchShowData = async () => {
         try {
-          const [show, episodes] = await Promise.all([
+          const [show, episodes, seasonsData] = await Promise.all([
             getShowDetails(showId),
-            getShowEpisodes(showId, 1) // Get first season
+            getShowEpisodes(showId, 1), // Get first season
+            getShowSeasons(showId)
           ]);
           setShowData(show);
           setEpisodeData(episodes);
+          setSeasons(seasonsData);
         } catch (error) {
           console.error('Error fetching show details:', error);
         } finally {
@@ -32,6 +39,25 @@ function ShowDetailsPage() {
       fetchShowData();
     }
   }, [showId]);
+
+  const handleSeasonChange = async (seasonNumber) => {
+    if (seasonNumber === selectedSeason) return;
+    
+    try {
+      setEpisodesLoading(true);
+      setSelectedSeason(seasonNumber);
+      const episodes = await getShowEpisodes(showId, seasonNumber);
+      setEpisodeData(episodes);
+    } catch (error) {
+      console.error('Error fetching episodes for season:', error);
+    } finally {
+      setEpisodesLoading(false);
+    }
+  };
+
+  const handleWatchNow = () => {
+    router.push(`/shows/watch/${showId}/1/1`);
+  };
 
   if (loading) {
     return (
@@ -142,50 +168,93 @@ function ShowDetailsPage() {
                   )}
                 </div>
 
-                <button className="bg-netflix-red hover:bg-netflix-red-dark text-netflix-white font-semibold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105">
+                <button 
+                  onClick={handleWatchNow}
+                  className="bg-netflix-red hover:bg-netflix-red-dark text-netflix-white font-semibold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105"
+                >
                   ▶ Watch Now
                 </button>
               </div>
             </div>
 
             {/* Episodes */}
-            {episodeData.length > 0 && (
+            {(episodeData.length > 0 || seasons.length > 0) && (
               <div className="mt-12">
-                <h2 className="text-2xl font-bold text-netflix-white mb-6">Episodes</h2>
-                <div className="grid gap-4">
-                  {episodeData.slice(0, 10).map((episode) => (
-                    <div
-                      key={episode.id}
-                      className="bg-netflix-gray/20 rounded-lg p-4 hover:bg-netflix-gray/30 transition-colors"
-                    >
-                      <div className="flex items-start space-x-4">
-                        {episode.image && (
-                          <img
-                            src={episode.image}
-                            alt={episode.title}
-                            className="w-32 h-18 object-cover rounded"
-                          />
-                        )}
-                        <div className="flex-1">
-                          <h3 className="text-netflix-white font-semibold">
-                            {episode.episodeNumber}. {episode.title}
-                          </h3>
-                          {episode.overview && (
-                            <p className="text-netflix-text-gray text-sm mt-2 line-clamp-2">
-                              {episode.overview}
-                            </p>
-                          )}
-                          <div className="flex items-center space-x-4 mt-2 text-xs text-netflix-text-gray">
-                            {episode.runtime && <span>{episode.runtime}m</span>}
-                            {episode.airDate && (
-                              <span>{new Date(episode.airDate).toLocaleDateString()}</span>
-                            )}
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-netflix-white">Episodes</h2>
+                  
+                  {/* Season Selector */}
+                  {seasons.length > 1 && (
+                    <div className="relative">
+                      <select
+                        value={selectedSeason}
+                        onChange={(e) => handleSeasonChange(parseInt(e.target.value))}
+                        disabled={episodesLoading}
+                        className="bg-netflix-gray text-netflix-white px-4 py-2 rounded-md border border-netflix-gray/50 focus:outline-none focus:ring-2 focus:ring-netflix-red disabled:opacity-50"
+                      >
+                        {seasons.map((season) => (
+                          <option key={season.seasonNumber} value={season.seasonNumber}>
+                            Season {season.seasonNumber}
+                            {season.name !== `Season ${season.seasonNumber}` && ` - ${season.name}`}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {episodesLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-netflix-red mx-auto mb-2"></div>
+                    <p className="text-netflix-text-gray">Loading episodes...</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {episodeData.map((episode) => (
+                      <Link 
+                        key={episode.id} 
+                        href={`/shows/watch/${showId}/${selectedSeason}/${episode.episodeNumber}`}
+                      >
+                        <div className="bg-netflix-gray/20 rounded-lg p-4 hover:bg-netflix-gray/30 transition-colors cursor-pointer group">
+                          <div className="flex items-start space-x-4">
+                            <div className="relative">
+                              {episode.image && (
+                                <img
+                                  src={episode.image}
+                                  alt={episode.title}
+                                  className="w-32 h-18 object-cover rounded"
+                                />
+                              )}
+                              {/* Play button overlay */}
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
+                                <FaPlay className="text-netflix-white text-xl" />
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-netflix-white font-semibold group-hover:text-netflix-red transition-colors">
+                                {episode.episodeNumber}. {episode.title}
+                              </h3>
+                              {episode.overview && (
+                                <p className="text-netflix-text-gray text-sm mt-2 line-clamp-2">
+                                  {episode.overview}
+                                </p>
+                              )}
+                              <div className="flex items-center space-x-4 mt-2 text-xs text-netflix-text-gray">
+                                {episode.runtime && <span>{episode.runtime}m</span>}
+                                {episode.airDate && (
+                                  <span>{new Date(episode.airDate).toLocaleDateString()}</span>
+                                )}
+                                {episode.rating && (
+                                  <span>⭐ {episode.rating.toFixed(1)}</span>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

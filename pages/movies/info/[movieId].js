@@ -63,6 +63,10 @@ function MovieDetailsPage() {
     }).format(amount);
   };
 
+  const handleWatchNow = () => {
+    router.push(`/movies/watch/${movieId}`);
+  };
+
   return (
     <>
       <Head>
@@ -170,7 +174,10 @@ function MovieDetailsPage() {
                   )}
                 </div>
 
-                <button className="bg-netflix-red hover:bg-netflix-red-dark text-netflix-white font-semibold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105">
+                <button 
+                  onClick={handleWatchNow}
+                  className="bg-netflix-red hover:bg-netflix-red-dark text-netflix-white font-semibold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105"
+                >
                   ▶ Watch Now
                 </button>
               </div>

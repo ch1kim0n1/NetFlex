@@ -174,6 +174,26 @@ export const getOnTheAirShows = async (count = 20) => {
   }
 };
 
+export const getShowSeasons = async (id) => {
+  try {
+    const response = await fetch(`${baseUrl}/tv/${id}?api_key=${apiKey}&language=en-US`);
+    const data = await response.json();
+    
+    return data.seasons?.map(season => ({
+      id: season.id,
+      seasonNumber: season.season_number,
+      name: season.name,
+      overview: season.overview,
+      posterPath: season.poster_path ? `${imageBaseUrl}${season.poster_path}` : null,
+      airDate: season.air_date,
+      episodeCount: season.episode_count,
+    })) || [];
+  } catch (error) {
+    console.error('Error fetching show seasons:', error);
+    return [];
+  }
+};
+
 export const searchShows = async (query, count = 20) => {
   try {
     const response = await fetch(`${baseUrl}/search/tv?api_key=${apiKey}&language=en-US&query=${encodeURIComponent(query)}&page=1`);

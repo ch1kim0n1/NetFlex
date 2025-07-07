@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import MainLayout from '../../../../../components/ui/MainLayout';
 import StreamingPlayer from '../../../../../components/StreamingPlayer';
-import { getShowDetails, getShowEpisodes } from '../../../../../src/handlers/shows';
+import SeasonEpisodeSelector from '../../../../../components/shows/SeasonEpisodeSelector';
+import { getShowDetails, getShowEpisodes, getShowSeasons } from '../../../../../src/handlers/shows';
 import { FaArrowLeft, FaPlay, FaPlus, FaThumbsUp, FaShare, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Link from 'next/link';
 
@@ -12,8 +13,10 @@ function WatchEpisode() {
   const { showId, season, episode } = router.query;
   const [show, setShow] = useState(null);
   const [episodes, setEpisodes] = useState([]);
+  const [seasons, setSeasons] = useState([]);
   const [currentEpisode, setCurrentEpisode] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [seasonsLoading, setSeasonsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -23,10 +26,11 @@ function WatchEpisode() {
       try {
         setLoading(true);
         
-        // Fetch show details and episodes in parallel
-        const [showData, episodesData] = await Promise.all([
+        // Fetch show details, episodes, and seasons in parallel
+        const [showData, episodesData, seasonsData] = await Promise.all([
           getShowDetails(showId),
-          getShowEpisodes(showId, parseInt(season))
+          getShowEpisodes(showId, parseInt(season)),
+          getShowSeasons(showId)
         ]);
         
         if (showData) {
@@ -34,6 +38,10 @@ function WatchEpisode() {
         } else {
           setError('Show not found');
           return;
+        }
+
+        if (seasonsData) {
+          setSeasons(seasonsData);
         }
         
         if (episodesData) {
@@ -74,6 +82,20 @@ function WatchEpisode() {
   const hasPreviousEpisode = () => {
     const currentIndex = getCurrentEpisodeIndex();
     return currentIndex > 0;
+  };
+
+  const handleSeasonChange = async (newSeason) => {
+    if (newSeason === parseInt(season)) return;
+    
+    try {
+      setSeasonsLoading(true);
+      const newEpisodesData = await getShowEpisodes(showId, newSeason);
+      setEpisodes(newEpisodesData);
+    } catch (err) {
+      console.error('Error fetching episodes for new season:', err);
+    } finally {
+      setSeasonsLoading(false);
+    }
   };
 
   if (loading) {
@@ -207,8 +229,20 @@ function WatchEpisode() {
               </div>
             </div>
 
-            {/* Episode Information */}
-            <div className="lg:col-span-1">
+            {/* Episode Information and Season/Episode Selector */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Season/Episode Selector */}
+              <SeasonEpisodeSelector
+                showId={showId}
+                currentSeason={season}
+                currentEpisode={episode}
+                seasons={seasons}
+                episodes={episodes}
+                onSeasonChange={handleSeasonChange}
+                loading={seasonsLoading}
+              />
+              
+              {/* Current Episode Details */}
               <div className="bg-netflix-dark rounded-lg p-6">
                 <div className="mb-6">
                   <img 

@@ -1,28 +1,27 @@
 import { useState, useRef, useImperativeHandle, forwardRef } from "react";
 import { useRouter } from "next/router";
 import { CgSearch } from "react-icons/cg";
+import SearchAutocomplete from "./SearchAutocomplete";
 
 // Wrap the component with forwardRef to use ref from parent
 const SearchInput = forwardRef(({ type }, ref) => {
-  const [search, setSearch] = useState("");
   const [searchType, setSearchType] = useState("shows");
+  const [isAutocompleteFocused, setIsAutocompleteFocused] = useState(false);
   const router = useRouter();
-  const inputRef = useRef(null);
+  const autocompleteRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
     focusInput: () => {
-      inputRef.current.focus();
+      setIsAutocompleteFocused(true);
     },
   }));
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!search) return;
-    router.push(`/${searchType}/search/${search}`);
+  const handleClose = () => {
+    setIsAutocompleteFocused(false);
   };
 
   return (
-    <div className="p-6 bg-netflix-dark border border-netflix-gray rounded-2xl space-y-5 max-w-md mx-auto">
+    <div className="p-6 bg-netflix-dark border border-netflix-gray rounded-2xl space-y-5 max-w-2xl mx-auto">
       <p className="text-netflix-white text-lg font-semibold">Looking for something?</p>
       
       {/* Search Type Toggle */}
@@ -51,21 +50,13 @@ const SearchInput = forwardRef(({ type }, ref) => {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="sm:w-[350px] rounded-md transition-all h-12 flex items-center space-x-2 bg-netflix-gray/20 border border-netflix-gray/30">
-        <input
-          ref={inputRef}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="text-netflix-white placeholder:text-netflix-text-gray bg-transparent w-full outline-none pl-4 h-full"
-          placeholder={`Search ${searchType === "shows" ? "TV shows" : "movies"}...`}
-        />
-        <button
-          type="submit"
-          className="text-netflix-text-gray hover:text-netflix-white text-2xl transition-all pr-4"
-        >
-          <CgSearch />
-        </button>
-      </form>
+      {/* Search Autocomplete */}
+      <SearchAutocomplete
+        ref={autocompleteRef}
+        searchType={searchType}
+        onClose={handleClose}
+        autoFocus={isAutocompleteFocused}
+      />
     </div>
   );
 });

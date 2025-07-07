@@ -131,9 +131,6 @@ function StreamingPlayer({ streamingUrls, title, type = 'movie', episode = null 
               <span>Subtitles: Available</span>
             </div>
           </div>
-          <div className="text-netflix-text-gray text-sm">
-            Powered by {sources[currentSource]?.name}
-          </div>
         </div>
       </div>
     </div>
