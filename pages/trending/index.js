@@ -61,7 +61,7 @@ export default function Trending() {
           {trendingShows.length > 0 && (
             <ContentRow title="Trending TV Shows">
               {trendingShows.map((show) => (
-                <div key={show.id} className="flex-none w-80">
+                <div key={show.id} className="flex-none w-60">
                   <ShowCard data={show} />
                 </div>
               ))}
@@ -71,7 +71,7 @@ export default function Trending() {
           {trendingMovies.length > 0 && (
             <ContentRow title="Trending Movies">
               {trendingMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-80">
+                <div key={movie.id} className="flex-none w-60">
                   <MovieCard data={movie} />
                 </div>
               ))}

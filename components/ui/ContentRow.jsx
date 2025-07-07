@@ -27,7 +27,7 @@ function ContentRow({ title, children, className = "" }) {
   };
 
   return (
-    <div className={`relative group ${className}`}>
+    <div className={`relative content-row-container ${className}`}>
       <h2 className="text-netflix-white text-xl font-semibold mb-4 px-6">{title}</h2>
       
       <div className="relative">
@@ -36,7 +36,7 @@ function ContentRow({ title, children, className = "" }) {
           onClick={() => scroll('left')}
           className={`absolute left-0 top-1/2 transform -translate-y-1/2 z-20 bg-netflix-black/80 hover:bg-netflix-black/90 text-netflix-white p-2 rounded-full transition-all duration-300 ${
             showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          } group-hover:opacity-100`}
+          } content-row-container:hover:opacity-100`}
         >
           <FaChevronLeft size={20} />
         </button>
@@ -46,7 +46,7 @@ function ContentRow({ title, children, className = "" }) {
           onClick={() => scroll('right')}
           className={`absolute right-0 top-1/2 transform -translate-y-1/2 z-20 bg-netflix-black/80 hover:bg-netflix-black/90 text-netflix-white p-2 rounded-full transition-all duration-300 ${
             showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          } group-hover:opacity-100`}
+          } content-row-container:hover:opacity-100`}
         >
           <FaChevronRight size={20} />
         </button>

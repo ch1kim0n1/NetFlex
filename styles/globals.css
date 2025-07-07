@@ -145,3 +145,18 @@ p {
 .animate-fadeIn {
   animation: fadeIn 1s ease-out forwards;
 }
+
+/* Content Row Hover Effects - Custom to avoid conflicts with Tailwind group classes */
+.content-row-container:hover .content-row-container\:hover\:opacity-100 {
+  opacity: 1;
+}
+
+/* Ensure scrollbar is hidden for content rows */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

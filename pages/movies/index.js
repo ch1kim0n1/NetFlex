@@ -79,7 +79,7 @@ export default function Movies() {
           {recentlyWatchedMovies.length > 0 && (
             <ContentRow title="Continue Watching">
               {recentlyWatchedMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-80">
+                <div key={movie.id} className="flex-none w-60">
                   <RecentlyWatchedCard 
                     data={movie} 
                     onRemove={handleRemoveFromRecentlyWatched}
@@ -92,7 +92,7 @@ export default function Movies() {
           {trendingMovies.length > 0 && (
             <ContentRow title="Trending Movies">
               {trendingMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-80">
+                <div key={movie.id} className="flex-none w-60">
                   <MovieCard data={movie} />
                 </div>
               ))}
@@ -102,7 +102,7 @@ export default function Movies() {
           {nowPlayingMovies.length > 0 && (
             <ContentRow title="Now Playing">
               {nowPlayingMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-80">
+                <div key={movie.id} className="flex-none w-60">
                   <MovieCard data={movie} />
                 </div>
               ))}
@@ -112,7 +112,7 @@ export default function Movies() {
           {popularMovies.length > 0 && (
             <ContentRow title="Popular Movies">
               {popularMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-80">
+                <div key={movie.id} className="flex-none w-60">
                   <MovieCard data={movie} />
                 </div>
               ))}
@@ -122,7 +122,7 @@ export default function Movies() {
           {topRatedMovies.length > 0 && (
             <ContentRow title="Top Rated">
               {topRatedMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-80">
+                <div key={movie.id} className="flex-none w-60">
                   <MovieCard data={movie} />
                 </div>
               ))}
@@ -132,7 +132,7 @@ export default function Movies() {
           {upcomingMovies.length > 0 && (
             <ContentRow title="Coming Soon">
               {upcomingMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-80">
+                <div key={movie.id} className="flex-none w-60">
                   <MovieCard data={movie} />
                 </div>
               ))}

@@ -76,7 +76,7 @@ export default function Shows() {
           {recentlyWatchedShows.length > 0 && (
             <ContentRow title="Continue Watching">
               {recentlyWatchedShows.map((show) => (
-                <div key={show.id} className="flex-none w-80">
+                <div key={show.id} className="flex-none w-60">
                   <RecentlyWatchedCard 
                     data={show} 
                     onRemove={handleRemoveFromRecentlyWatched}
@@ -89,7 +89,7 @@ export default function Shows() {
           {trendingShows.length > 0 && (
             <ContentRow title="Trending Now">
               {trendingShows.map((show) => (
-                <div key={show.id} className="flex-none w-80">
+                <div key={show.id} className="flex-none w-60">
                   <ShowCard data={show} />
                 </div>
               ))}
@@ -99,7 +99,7 @@ export default function Shows() {
           {popularShows.length > 0 && (
             <ContentRow title="Popular TV Shows">
               {popularShows.map((show) => (
-                <div key={show.id} className="flex-none w-80">
+                <div key={show.id} className="flex-none w-60">
                   <ShowCard data={show} />
                 </div>
               ))}
@@ -109,7 +109,7 @@ export default function Shows() {
           {topRatedShows.length > 0 && (
             <ContentRow title="Top Rated">
               {topRatedShows.map((show) => (
-                <div key={show.id} className="flex-none w-80">
+                <div key={show.id} className="flex-none w-60">
                   <ShowCard data={show} />
                 </div>
               ))}
@@ -119,7 +119,7 @@ export default function Shows() {
           {onTheAirShows.length > 0 && (
             <ContentRow title="Currently Airing">
               {onTheAirShows.map((show) => (
-                <div key={show.id} className="flex-none w-80">
+                <div key={show.id} className="flex-none w-60">
                   <ShowCard data={show} />
                 </div>
               ))}

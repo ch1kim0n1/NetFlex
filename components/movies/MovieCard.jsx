@@ -21,7 +21,7 @@ function MovieCard({ data }) {
     <>
       <Link href={"/movies/info/" + data.id}>
         <div className="group cursor-pointer">
-          <div className="relative aspect-[16/9] rounded-md overflow-hidden bg-netflix-gray">
+          <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-netflix-gray">
             <div className="transition-all duration-300 ease-in-out group-hover:scale-110">
               <LazyLoadImage
                 effect="blur"
