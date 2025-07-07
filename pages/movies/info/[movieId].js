@@ -3,7 +3,9 @@ import React from "react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import MainLayout from "../../../components/ui/MainLayout";
+import ParticleBackground from "../../../components/ui/ParticleBackground";
 import { getMovieDetails } from "../../../src/handlers/movies";
+import { FaArrowLeft } from 'react-icons/fa';
 
 function MovieDetailsPage() {
   const router = useRouter();
@@ -81,7 +83,19 @@ function MovieDetailsPage() {
       </Head>
 
       <MainLayout useHead={false} banner={movieData.bannerImage} type="movies" showBrowseButtons={true}>
-        <div className="px-6 py-8">
+        <ParticleBackground />
+        <div className="px-8 py-8 relative z-10">
+          {/* Back Button */}
+          <div className="max-w-6xl mx-auto mb-6">
+            <button 
+              onClick={() => router.back()}
+              className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
+            >
+              <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
+              <span>Back</span>
+            </button>
+          </div>
+          
           {/* Movie Details */}
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8">

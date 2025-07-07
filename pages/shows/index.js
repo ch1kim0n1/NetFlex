@@ -1,5 +1,6 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import MainLayout from "../../components/ui/MainLayout";
 import ContentRow from "../../components/ui/ContentRow";
 import ShowCard from "../../components/shows/ShowCard";
@@ -8,8 +9,10 @@ import ParticleBackground from "../../components/ui/ParticleBackground";
 import GenreSelector from "../../components/ui/GenreSelector";
 import { getPopularShows, getTrendingShows, getTopRatedShows, getOnTheAirShows, getGenres, getShowsByGenre } from "../../src/handlers/shows";
 import { getRecentlyWatchedShows } from "../../src/utils/viewingHistory";
+import { FaArrowLeft } from 'react-icons/fa';
 
 export default function Shows() {
+  const router = useRouter();
   const [popularShows, setPopularShows] = useState([]);
   const [trendingShows, setTrendingShows] = useState([]);
   const [topRatedShows, setTopRatedShows] = useState([]);
@@ -91,7 +94,17 @@ export default function Shows() {
       <MainLayout showBrowseButtons={true}>
         <ParticleBackground />
         <div className="pt-8 space-y-8 relative z-10">
-          <div className="px-6">
+          <div className="px-8">
+            <div className="mb-6">
+              <button 
+                onClick={() => router.push('/')}
+                className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
+              >
+                <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
+                <span>Back to Home</span>
+              </button>
+            </div>
+            
             <h1 className="text-4xl font-bold text-netflix-white mb-4">TV Shows</h1>
             <p className="text-netflix-text-gray text-lg">
               Discover award-winning series, binge-worthy dramas, and trending shows.

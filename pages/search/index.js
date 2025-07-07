@@ -5,7 +5,7 @@ import MainLayout from "../../components/ui/MainLayout";
 import MovieCard from "../../components/movies/MovieCard";
 import ShowCard from "../../components/shows/ShowCard";
 import ParticleBackground from "../../components/ui/ParticleBackground";
-import { FaSearch, FaFilter, FaTimes, FaSort } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaTimes, FaSort, FaArrowLeft } from 'react-icons/fa';
 import { searchMovies, getMovieGenres, getPopularMovies, getTrendingMovies } from "../../src/handlers/movies";
 import { searchShows, getGenres, getPopularShows, getTrendingShows } from "../../src/handlers/shows";
 
@@ -212,10 +212,21 @@ export default function GlobalSearch() {
       <MainLayout showBrowseButtons={true}>
         <ParticleBackground />
         <div className="pt-8 space-y-8 relative z-10">
-          <div className="px-6">
-            <h1 className="text-4xl font-bold text-netflix-white mb-4">Search & Discover</h1>
-            <p className="text-netflix-text-gray text-lg mb-6">
-              Find your next favorite movie or TV show with our comprehensive search.
+          <div className="px-8">
+            {/* Back Button */}
+            <div className="mb-6">
+              <button 
+                onClick={() => router.back()}
+                className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
+              >
+                <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
+                <span>Back</span>
+              </button>
+            </div>
+            
+            <h1 className="text-4xl font-bold text-netflix-white mb-4">Advanced Search</h1>
+            <p className="text-netflix-text-gray text-lg">
+              Explore movies and TV shows with advanced filters and sorting options
             </p>
 
             {/* Search Bar */}
@@ -308,7 +319,7 @@ export default function GlobalSearch() {
           </div>
 
           {/* Results Grid */}
-          <div className="px-6">
+          <div className="px-8">
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-netflix-white text-xl">Loading...</div>

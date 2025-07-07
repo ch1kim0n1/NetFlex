@@ -165,7 +165,7 @@ function WatchEpisode() {
       <div className="min-h-screen bg-netflix-black">
         {/* Header Controls */}
         <div className="sticky top-0 bg-netflix-black/80 backdrop-blur-md z-20 border-b border-netflix-gray/30">
-          <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="max-w-7xl mx-auto px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <button 
@@ -200,7 +200,7 @@ function WatchEpisode() {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-8 py-8">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Streaming Player */}
             <div className="lg:col-span-2">

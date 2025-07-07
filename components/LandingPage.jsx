@@ -52,10 +52,10 @@ function LandingPage() {
         </div>
         
         {/* Content */}
-        <div className="relative z-20 px-6 max-w-6xl mx-auto">
+        <div className="relative z-20 px-8 max-w-6xl mx-auto">
           <div className="max-w-3xl">
-            <h1 className="text-6xl md:text-8xl font-black text-netflix-white mb-6 leading-tight animate-fadeIn">
-                                  NetFlex
+            <h1 className="text-6xl md:text-8xl font-black text-netflix-white mb-6 leading-tight animate-fadeIn drop-shadow-2xl" style={{ textShadow: '0 0 20px rgba(229, 9, 20, 0.3), 0 0 40px rgba(229, 9, 20, 0.15)' }}>
+              NetFlex
             </h1>
             <p className="text-xl md:text-2xl text-netflix-white mb-8 font-medium animate-fadeIn">
               Unlimited movies, TV shows and more.
@@ -65,18 +65,22 @@ function LandingPage() {
               No ads, no interruptions, just pure entertainment.
             </p>
             
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-12 animate-fadeIn">
-              <Link href="/shows">
-                <button className="group flex items-center justify-center gap-3 bg-netflix-red hover:bg-netflix-red-dark text-netflix-white font-semibold py-4 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg">
-                  <FaPlay className="text-lg" />
-                  <span className="text-lg">Watch TV Shows</span>
-                </button>
-              </Link>
-              <Link href="/movies">
-                <button className="group flex items-center justify-center gap-3 bg-netflix-gray/80 hover:bg-netflix-gray text-netflix-white font-semibold py-4 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg">
-                  <FaInfoCircle className="text-lg" />
-                  <span className="text-lg">Browse Movies</span>
+            {/* Action Button */}
+            <div className="flex justify-center mb-12 animate-fadeIn">
+              <Link href="/search">
+                <button className="group relative flex items-center justify-center gap-3 bg-netflix-red hover:bg-netflix-red-dark text-netflix-white font-bold py-5 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-2xl overflow-hidden">
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-netflix-red/50 blur-xl animate-pulse"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-netflix-red via-netflix-red-dark to-netflix-red opacity-80"></div>
+                  
+                  {/* Content */}
+                  <div className="relative flex items-center gap-3">
+                    <FaPlay className="text-xl" />
+                    <span className="text-xl">Start Search</span>
+                  </div>
+                  
+                  {/* Additional glow on hover */}
+                  <div className="absolute inset-0 bg-netflix-red/30 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
               </Link>
             </div>
@@ -88,7 +92,7 @@ function LandingPage() {
       </div>
 
       {/* Content Categories */}
-      <div className="px-6 pb-20">
+      <div className="px-8 pb-20">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
             <Link href="/shows">

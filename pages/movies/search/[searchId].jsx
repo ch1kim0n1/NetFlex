@@ -4,6 +4,7 @@ import Head from "next/head";
 import MainLayout from "../../../components/ui/MainLayout";
 import MovieCard from "../../../components/movies/MovieCard";
 import { searchMovies } from '../../../src/handlers/movies';
+import { FaArrowLeft } from 'react-icons/fa';
 
 function MovieSearchPage() {
   const router = useRouter();
@@ -57,7 +58,18 @@ function MovieSearchPage() {
       </Head>
       
       <MainLayout useHead={false} type={"movies"}>
-        <div className="pt-10 px-6">
+        <div className="pt-10 px-8">
+          {/* Back Button */}
+          <div className="mb-6">
+            <button 
+              onClick={() => router.back()}
+              className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
+            >
+              <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
+              <span>Back</span>
+            </button>
+          </div>
+
           <h1 className="text-netflix-white text-2xl font-bold mb-6">
             Search Results &gt; {searchId}
           </h1>

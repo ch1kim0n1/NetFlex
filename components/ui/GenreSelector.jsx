@@ -29,7 +29,7 @@ const GenreSelector = ({ genres, selectedGenre, onGenreSelect, type = 'show' }) 
   };
 
   return (
-    <div className="relative px-6 mb-8">
+    <div className="relative px-8 mb-8">
       <div className="flex flex-col space-y-4">
         <h3 className="text-xl font-semibold text-netflix-white">Browse by Genre</h3>
         

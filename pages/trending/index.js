@@ -1,5 +1,6 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import MainLayout from "../../components/ui/MainLayout";
 import ContentRow from "../../components/ui/ContentRow";
 import ShowCard from "../../components/shows/ShowCard";
@@ -7,8 +8,10 @@ import MovieCard from "../../components/movies/MovieCard";
 import ParticleBackground from "../../components/ui/ParticleBackground";
 import { getTrendingShows } from "../../src/handlers/shows";
 import { getTrendingMovies } from "../../src/handlers/movies";
+import { FaArrowLeft } from 'react-icons/fa';
 
 export default function Trending() {
+  const router = useRouter();
   const [trendingShows, setTrendingShows] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +56,17 @@ export default function Trending() {
       <MainLayout showBrowseButtons={true}>
         <ParticleBackground />
         <div className="pt-8 space-y-8 relative z-10">
-          <div className="px-6">
+          <div className="px-8">
+            <div className="mb-6">
+              <button 
+                onClick={() => router.push('/')}
+                className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
+              >
+                <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
+                <span>Back to Home</span>
+              </button>
+            </div>
+            
             <h1 className="text-4xl font-bold text-netflix-white mb-4">Trending Now</h1>
             <p className="text-netflix-text-gray text-lg">
               Discover what everyone is watching right now.
