@@ -8,8 +8,10 @@ const NetFlexIntro = ({ onComplete }) => {
   const particlesRef = useRef(null);
   const lightSweepRef = useRef(null);
   const glowRef = useRef(null);
+  const reviewsRef = useRef(null);
   const [isVisible, setIsVisible] = useState(true);
   const [particles, setParticles] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   // Generate particle system
   useEffect(() => {
@@ -25,6 +27,58 @@ const NetFlexIntro = ({ onComplete }) => {
       });
     }
     setParticles(particleArray);
+
+    // Generate review testimonials
+    const reviewTexts = [
+      { text: "Best streaming platform ever created!", rating: 5, author: "Sarah M." },
+      { text: "Netflix killer! Amazing content selection.", rating: 5, author: "Mike T." },
+      { text: "Crystal clear quality and no buffering.", rating: 5, author: "Emma L." },
+      { text: "Love the interface and recommendations!", rating: 4, author: "David R." },
+      { text: "Finally, a platform that actually works!", rating: 5, author: "Lisa K." },
+      { text: "Incredible variety of shows and movies.", rating: 5, author: "John D." },
+      { text: "Smooth streaming, zero interruptions.", rating: 4, author: "Ana G." },
+      { text: "This is the future of entertainment!", rating: 5, author: "Chris P." },
+      { text: "Blown away by the user experience.", rating: 5, author: "Maya S." },
+      { text: "Perfect for binge-watching sessions!", rating: 4, author: "Tom W." }
+    ];
+
+    const reviewArray = [];
+    for (let i = 0; i < 3; i++) {
+      const randomReview = reviewTexts[Math.floor(Math.random() * reviewTexts.length)];
+      
+      // Generate position that avoids center (logo area)
+      let x, y;
+      const side = Math.floor(Math.random() * 4);
+      
+      switch(side) {
+        case 0: // Top area
+          x = Math.random() * 80 + 10;
+          y = Math.random() * 25 + 5; // Top 30%
+          break;
+        case 1: // Bottom area  
+          x = Math.random() * 80 + 10;
+          y = Math.random() * 25 + 70; // Bottom 30%
+          break;
+        case 2: // Left area
+          x = Math.random() * 25 + 5; // Left 30%
+          y = Math.random() * 60 + 20; // Avoid very top/bottom
+          break;
+        case 3: // Right area
+          x = Math.random() * 25 + 70; // Right 30%
+          y = Math.random() * 60 + 20; // Avoid very top/bottom
+          break;
+      }
+      
+      reviewArray.push({
+        id: i,
+        ...randomReview,
+        x: x,
+        y: y,
+        delay: Math.random() * 4 + 1, // Stagger appearance
+        duration: Math.random() * 2 + 3, // How long they stay
+      });
+    }
+    setReviews(reviewArray);
   }, []);
 
   // Main animation timeline
@@ -38,6 +92,7 @@ const NetFlexIntro = ({ onComplete }) => {
     const particlesContainer = particlesRef.current;
     const lightSweep = lightSweepRef.current;
     const glow = glowRef.current;
+    const reviewsContainer = reviewsRef.current;
 
     // Set initial states
     gsap.set(container, { opacity: 0 });
@@ -52,6 +107,7 @@ const NetFlexIntro = ({ onComplete }) => {
     gsap.set(particlesContainer, { opacity: 0 });
     gsap.set(lightSweep, { x: -200, opacity: 0 });
     gsap.set(glow, { opacity: 0, scale: 0.8 });
+    gsap.set(reviewsContainer, { opacity: 0 });
 
     // Animation sequence
     tl
@@ -91,6 +147,13 @@ const NetFlexIntro = ({ onComplete }) => {
         duration: 1, 
         ease: "power2.inOut" 
       }, "-=1")
+      
+      // 4.5. Reviews fade in
+      .to(reviewsContainer, { 
+        opacity: 1, 
+        duration: 0.8, 
+        ease: "power2.inOut" 
+      }, "-=0.5")
       
       // 5. Light sweep effect
       .to(lightSweep, { 
@@ -165,10 +228,54 @@ const NetFlexIntro = ({ onComplete }) => {
       }
     });
 
+    // Review testimonial animations
+    reviews.forEach((review, index) => {
+      const element = reviewsContainer?.children[index];
+      if (element) {
+        // Initial state for each review
+        gsap.set(element, {
+          opacity: 0,
+          scale: 0.8,
+          y: 20
+        });
+
+        // Staggered appearance animation
+        gsap.to(element, {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          delay: review.delay
+        });
+
+        // Gentle floating motion
+        gsap.to(element, {
+          y: `+=${Math.random() * 20 - 10}`,
+          x: `+=${Math.random() * 15 - 7.5}`,
+          rotation: Math.random() * 4 - 2,
+          duration: Math.random() * 3 + 2,
+          repeat: -1,
+          yoyo: true,
+          ease: "power1.inOut",
+          delay: review.delay + 0.6
+        });
+
+        // Fade out before main animation ends
+        gsap.to(element, {
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.8,
+          ease: "power2.in",
+          delay: review.delay + review.duration
+        });
+      }
+    });
+
     return () => {
       tl.kill();
     };
-  }, [particles, onComplete]);
+  }, [particles, reviews, onComplete]);
 
   // Hover effect
   const handleLogoHover = () => {
@@ -234,6 +341,52 @@ const NetFlexIntro = ({ onComplete }) => {
               filter: 'blur(0.5px)'
             }}
           />
+        ))}
+      </div>
+
+      {/* Floating Review Testimonials */}
+      <div 
+        ref={reviewsRef}
+        className="absolute inset-0 pointer-events-none z-10"
+      >
+        {reviews.map((review) => (
+          <div
+            key={review.id}
+            className="absolute bg-black/80 backdrop-blur-md text-white p-3 rounded-lg border border-red-500/30 shadow-2xl max-w-xs"
+            style={{
+              left: `${review.x}%`,
+              top: `${review.y}%`,
+              transform: 'translate(-50%, -50%)',
+              boxShadow: '0 0 20px rgba(229, 9, 20, 0.3), 0 8px 32px rgba(0, 0, 0, 0.8)'
+            }}
+          >
+            <div className="flex items-center gap-1 mb-2">
+              {[...Array(5)].map((_, i) => (
+                <span
+                  key={i}
+                  className={`text-sm ${
+                    i < review.rating 
+                      ? 'text-yellow-400 drop-shadow-sm' 
+                      : 'text-gray-600'
+                  }`}
+                  style={{
+                    textShadow: i < review.rating ? '0 0 4px rgba(251, 191, 36, 0.6)' : 'none'
+                  }}
+                >
+                  ★
+                </span>
+              ))}
+              <span className="text-yellow-400 text-xs ml-1 font-bold">
+                {review.rating}/5
+              </span>
+            </div>
+            <p className="text-xs text-gray-100 leading-tight mb-2 font-medium">
+              "{review.text}"
+            </p>
+            <p className="text-xs text-red-400 font-semibold">
+              - {review.author}
+            </p>
+          </div>
         ))}
       </div>
 
