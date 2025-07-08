@@ -4,14 +4,22 @@
 const VIEWING_HISTORY_KEY = 'netflex_viewing_history';
 const MAX_RECENTLY_WATCHED = 10;
 
-// Import invalidateRecommendationCache to refresh recommendations when viewing history changes
+// Import invalidateRecommendationCache and recordImplicitFeedback for automatic learning
 let invalidateRecommendationCache = null;
+let recordImplicitFeedback = null;
+
 try {
   const recommendationsModule = require('./recommendations');
   invalidateRecommendationCache = recommendationsModule.invalidateRecommendationCache;
 } catch (error) {
-  // Handle case where recommendations module isn't available
   console.debug('Recommendations module not available');
+}
+
+try {
+  const feedbackModule = require('./userFeedback');
+  recordImplicitFeedback = feedbackModule.recordImplicitFeedback;
+} catch (error) {
+  console.debug('User feedback module not available');
 }
 
 // Get all viewing history from localStorage
@@ -25,7 +33,7 @@ export const getViewingHistory = () => {
   }
 };
 
-// Save viewing history to localStorage
+// Save viewing history to localStorage with automatic feedback learning
 const saveViewingHistory = (history) => {
   try {
     localStorage.setItem(VIEWING_HISTORY_KEY, JSON.stringify(history));
@@ -39,11 +47,56 @@ const saveViewingHistory = (history) => {
   }
 };
 
-// Add or update movie viewing progress with enhanced timestamp tracking
-export const updateMovieProgress = (movieData, progressPercentage = 0, watchedAt = new Date().toISOString(), currentTime = 0) => {
+// Automatically record implicit feedback based on viewing behavior
+const recordViewingFeedback = (contentData, progressPercentage, sessionDuration = 0) => {
+  if (!recordImplicitFeedback) return;
+
+  try {
+    // Determine feedback type based on viewing behavior
+    if (progressPercentage >= 90) {
+      // Completed content - strong positive signal
+      recordImplicitFeedback(contentData.id, contentData.type || 'movie', 'watch_complete', {
+        progressPercentage,
+        sessionDuration
+      });
+    } else if (progressPercentage >= 70) {
+      // Mostly watched - positive signal
+      recordImplicitFeedback(contentData.id, contentData.type || 'movie', 'watch_partial', {
+        progressPercentage,
+        sessionDuration
+      });
+    } else if (progressPercentage < 10 && sessionDuration < 300) {
+      // Quickly skipped - negative signal
+      recordImplicitFeedback(contentData.id, contentData.type || 'movie', 'skip_quickly', {
+        progressPercentage,
+        sessionDuration
+      });
+    }
+
+    // Check for rewatch behavior
+    const history = getViewingHistory();
+    const allContent = [...(history.movies || []), ...(history.shows || [])];
+    const previousWatches = allContent.filter(item => 
+      item.id === contentData.id && item.type === contentData.type
+    );
+    
+    if (previousWatches.length > 1) {
+      recordImplicitFeedback(contentData.id, contentData.type || 'movie', 'rewatch', {
+        rewatchCount: previousWatches.length,
+        progressPercentage
+      });
+    }
+  } catch (error) {
+    console.error('Error recording viewing feedback:', error);
+  }
+};
+
+// Add or update movie viewing progress with enhanced timestamp tracking and automatic feedback
+export const updateMovieProgress = (movieData, progressPercentage = 0, watchedAt = new Date().toISOString(), currentTime = 0, sessionDuration = 0) => {
   const history = getViewingHistory();
   
   // Remove existing entry if it exists
+  const existingMovie = history.movies.find(item => item.id === movieData.id);
   history.movies = history.movies.filter(item => item.id !== movieData.id);
   
   // Calculate precise timestamp in seconds
@@ -68,21 +121,27 @@ export const updateMovieProgress = (movieData, progressPercentage = 0, watchedAt
     // Enhanced tracking fields
     currentTimestamp: currentTime || exactTimestamp, // Exact position in seconds
     totalDuration: totalDuration,
-    sessionCount: 1, // Number of viewing sessions
+    sessionCount: (existingMovie?.sessionCount || 0) + 1,
     lastDevice: navigator.userAgent || 'Unknown',
-    watchingSessions: [{
-      startTime: watchedAt,
-      endTime: watchedAt,
-      duration: 0,
-      device: navigator.userAgent || 'Unknown',
-      progress: progressPercentage
-    }]
+    watchingSessions: [
+      ...(existingMovie?.watchingSessions || []),
+      {
+        startTime: watchedAt,
+        endTime: watchedAt,
+        duration: sessionDuration,
+        device: navigator.userAgent || 'Unknown',
+        progress: progressPercentage
+      }
+    ]
   };
   
   history.movies.unshift(movieEntry);
   
   // Keep only the most recent items
   history.movies = history.movies.slice(0, MAX_RECENTLY_WATCHED);
+  
+  // Record implicit feedback
+  recordViewingFeedback(movieEntry, progressPercentage, sessionDuration);
   
   saveViewingHistory(history);
   return movieEntry;
