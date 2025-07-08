@@ -4,7 +4,8 @@ import Head from 'next/head';
 import MainLayout from '../../../components/ui/MainLayout';
 import StreamingPlayer from '../../../components/StreamingPlayer';
 import { getMovieDetails } from '../../../src/handlers/movies';
-import { updateMovieProgress } from '../../../src/utils/viewingHistory';
+import { updateMovieProgress, invalidateRecommendationCache } from '../../../src/utils/viewingHistory';
+import { invalidateRecommendationCache as invalidateRecCache } from '../../../src/utils/recommendations';
 import { FaArrowLeft, FaPlay, FaPlus, FaThumbsUp, FaShare } from 'react-icons/fa';
 import Link from 'next/link';
 
@@ -44,6 +45,8 @@ function WatchMovie() {
       // Add to recently watched when user starts watching (5% progress)
       const trackInitialView = () => {
         updateMovieProgress(movie, 5);
+        // Invalidate recommendation cache to trigger new recommendations
+        invalidateRecCache();
       };
 
       // Add a small delay to ensure the movie has actually started

@@ -145,6 +145,11 @@ function Header({ bg = false, type, showBrowseButtons = false }) {
                   <span>Search</span>
                 </button>
               </Link>
+              <Link href={`/analytics`}>
+                <button title="Your Analytics" className="transition-all text-netflix-white hover:text-netflix-text-gray py-2 hover:underline underline-offset-4 decoration-2 decoration-netflix-red">
+                  <span>Analytics</span>
+                </button>
+              </Link>
             </div>
           )}
         </div>

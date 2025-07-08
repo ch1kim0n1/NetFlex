@@ -7,6 +7,7 @@ import MovieCard from "../../components/movies/MovieCard";
 import RecentlyWatchedCard from "../../components/ui/RecentlyWatchedCard";
 import ParticleBackground from "../../components/ui/ParticleBackground";
 import GenreSelector from "../../components/ui/GenreSelector";
+import PersonalizedCategories from "../../components/ui/PersonalizedCategories";
 import { getPopularMovies, getTrendingMovies, getTopRatedMovies, getUpcomingMovies, getNowPlayingMovies, getMovieGenres, getMoviesByGenre } from "../../src/handlers/movies";
 import { getRecentlyWatchedMovies } from "../../src/utils/viewingHistory";
 import { FaArrowLeft } from 'react-icons/fa';
@@ -143,6 +144,9 @@ export default function Movies() {
               ))}
             </ContentRow>
           )}
+
+          {/* Personalized Recommendations */}
+          <PersonalizedCategories contentType="movie" limit={15} />
 
           {trendingMovies.length > 0 && (
             <ContentRow title="Trending Movies">

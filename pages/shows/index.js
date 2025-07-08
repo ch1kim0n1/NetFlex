@@ -40,8 +40,8 @@ export default function Shows() {
         setOnTheAirShows(onTheAir);
         setGenres(showGenres);
         
-        // Load recently watched shows from localStorage
-        const recentlyWatched = getRecentlyWatchedShows();
+        // Load recently watched shows from localStorage (filter out anime)
+        const recentlyWatched = getRecentlyWatchedShows().filter(item => item.type === 'show');
         setRecentlyWatchedShows(recentlyWatched);
       } catch (error) {
         console.error('Error fetching shows:', error);

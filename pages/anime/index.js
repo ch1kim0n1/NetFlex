@@ -8,6 +8,7 @@ import ContentRow from "../../components/ui/ContentRow";
 import GenreSelector from "../../components/ui/GenreSelector";
 import AnimeCard from "../../components/anime/AnimeCard";
 import RecentlyWatchedCard from "../../components/ui/RecentlyWatchedCard";
+import PersonalizedCategories from "../../components/ui/PersonalizedCategories";
 import { 
   getPopularAnime, 
   getTrendingAnime, 
@@ -16,7 +17,7 @@ import {
   getAnimeGenres, 
   getAnimeByGenre 
 } from "../../src/handlers/anime";
-import { getRecentlyWatchedShows } from "../../src/utils/viewingHistory";
+import { getRecentlyWatchedAnime } from "../../src/utils/viewingHistory";
 
 export default function Anime() {
   const router = useRouter();
@@ -47,8 +48,8 @@ export default function Anime() {
         setOngoingAnime(ongoing);
         setGenres(animeGenres);
         
-        // Load recently watched anime from localStorage (filter for anime type)
-        const recentlyWatched = getRecentlyWatchedShows().filter(item => item.type === 'anime');
+        // Load recently watched anime from localStorage
+        const recentlyWatched = getRecentlyWatchedAnime();
         setRecentlyWatchedAnime(recentlyWatched);
       } catch (error) {
         console.error('Error fetching anime:', error);
@@ -147,6 +148,8 @@ export default function Anime() {
               ))}
             </ContentRow>
           )}
+
+          <PersonalizedCategories type="anime" />
 
           {trendingAnime.length > 0 && (
             <ContentRow title="Trending Anime">

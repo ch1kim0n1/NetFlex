@@ -4,6 +4,19 @@ const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const baseUrl = 'https://api.themoviedb.org/3';
 const imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
 
+// Animation genre ID to filter out anime content from TV shows
+const ANIMATION_GENRE_ID = 16;
+
+// Helper function to filter out anime content
+const filterOutAnime = (results) => {
+  return results.filter(item => {
+    // Exclude content with animation genre AND Japanese origin
+    const hasAnimationGenre = item.genre_ids?.includes(ANIMATION_GENRE_ID);
+    const isJapanese = item.origin_country?.includes('JP') || item.original_language === 'ja';
+    return !(hasAnimationGenre && isJapanese);
+  });
+};
+
 export const getShowDetails = async (id) => {
   try {
     // Fetch show details and external IDs in parallel
@@ -38,6 +51,7 @@ export const getShowDetails = async (id) => {
       imdbId,
       externalIds,
       streaming: streamingUrls,
+      type: 'show',
     };
   } catch (error) {
     console.error('Error fetching show details:', error);
@@ -86,7 +100,11 @@ export const getPopularShows = async (count = 20) => {
   try {
     const response = await fetch(`${baseUrl}/tv/popular?api_key=${apiKey}&language=en-US&page=1`);
     const data = await response.json();
-    return data.results?.slice(0, count).map(show => ({
+    
+    // Filter out anime content and add type
+    const filteredResults = filterOutAnime(data.results || []);
+    
+    return filteredResults.slice(0, count).map(show => ({
       id: show.id,
       title: {
         english: show.name,
@@ -98,7 +116,8 @@ export const getPopularShows = async (count = 20) => {
       rating: show.vote_average,
       releaseDate: show.first_air_date,
       genres: show.genre_ids,
-    })) || [];
+      type: 'show',
+    }));
   } catch (error) {
     console.error('Error fetching popular shows:', error);
     return [];
@@ -109,7 +128,11 @@ export const getTrendingShows = async (count = 20) => {
   try {
     const response = await fetch(`${baseUrl}/trending/tv/week?api_key=${apiKey}&language=en-US`);
     const data = await response.json();
-    return data.results?.slice(0, count).map(show => ({
+    
+    // Filter out anime content and add type
+    const filteredResults = filterOutAnime(data.results || []);
+    
+    return filteredResults.slice(0, count).map(show => ({
       id: show.id,
       title: {
         english: show.name,
@@ -121,7 +144,8 @@ export const getTrendingShows = async (count = 20) => {
       rating: show.vote_average,
       releaseDate: show.first_air_date,
       genres: show.genre_ids,
-    })) || [];
+      type: 'show',
+    }));
   } catch (error) {
     console.error('Error fetching trending shows:', error);
     return [];
@@ -132,7 +156,11 @@ export const getTopRatedShows = async (count = 20) => {
   try {
     const response = await fetch(`${baseUrl}/tv/top_rated?api_key=${apiKey}&language=en-US&page=1`);
     const data = await response.json();
-    return data.results?.slice(0, count).map(show => ({
+    
+    // Filter out anime content and add type
+    const filteredResults = filterOutAnime(data.results || []);
+    
+    return filteredResults.slice(0, count).map(show => ({
       id: show.id,
       title: {
         english: show.name,
@@ -144,7 +172,8 @@ export const getTopRatedShows = async (count = 20) => {
       rating: show.vote_average,
       releaseDate: show.first_air_date,
       genres: show.genre_ids,
-    })) || [];
+      type: 'show',
+    }));
   } catch (error) {
     console.error('Error fetching top rated shows:', error);
     return [];
@@ -155,7 +184,11 @@ export const getOnTheAirShows = async (count = 20) => {
   try {
     const response = await fetch(`${baseUrl}/tv/on_the_air?api_key=${apiKey}&language=en-US&page=1`);
     const data = await response.json();
-    return data.results?.slice(0, count).map(show => ({
+    
+    // Filter out anime content and add type
+    const filteredResults = filterOutAnime(data.results || []);
+    
+    return filteredResults.slice(0, count).map(show => ({
       id: show.id,
       title: {
         english: show.name,
@@ -167,7 +200,8 @@ export const getOnTheAirShows = async (count = 20) => {
       rating: show.vote_average,
       releaseDate: show.first_air_date,
       genres: show.genre_ids,
-    })) || [];
+      type: 'show',
+    }));
   } catch (error) {
     console.error('Error fetching on the air shows:', error);
     return [];
@@ -209,7 +243,11 @@ export const getShowsByGenre = async (genreId, count = 20) => {
   try {
     const response = await fetch(`${baseUrl}/discover/tv?api_key=${apiKey}&language=en-US&with_genres=${genreId}&page=1`);
     const data = await response.json();
-    return data.results?.slice(0, count).map(show => ({
+    
+    // Filter out anime content and add type
+    const filteredResults = filterOutAnime(data.results || []);
+    
+    return filteredResults.slice(0, count).map(show => ({
       id: show.id,
       title: {
         english: show.name,
@@ -221,7 +259,8 @@ export const getShowsByGenre = async (genreId, count = 20) => {
       rating: show.vote_average,
       releaseDate: show.first_air_date,
       genres: show.genre_ids,
-    })) || [];
+      type: 'show',
+    }));
   } catch (error) {
     console.error('Error fetching shows by genre:', error);
     return [];
@@ -232,7 +271,11 @@ export const searchShows = async (query, count = 20) => {
   try {
     const response = await fetch(`${baseUrl}/search/tv?api_key=${apiKey}&language=en-US&query=${encodeURIComponent(query)}&page=1`);
     const data = await response.json();
-    return data.results?.slice(0, count).map(show => ({
+    
+    // Filter out anime content and add type
+    const filteredResults = filterOutAnime(data.results || []);
+    
+    return filteredResults.slice(0, count).map(show => ({
       id: show.id,
       title: {
         english: show.name,
@@ -244,7 +287,8 @@ export const searchShows = async (query, count = 20) => {
       rating: show.vote_average,
       releaseDate: show.first_air_date,
       genres: show.genre_ids,
-    })) || [];
+      type: 'show',
+    }));
   } catch (error) {
     console.error('Error searching shows:', error);
     return [];
