@@ -62,7 +62,7 @@ function AnimeDetailsPage() {
 
   if (loading) {
     return (
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-netflix-white text-xl">Loading Anime Details...</div>
         </div>
@@ -72,7 +72,7 @@ function AnimeDetailsPage() {
 
   if (!animeData) {
     return (
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-netflix-white text-xl">Anime not found</div>
         </div>
@@ -93,7 +93,7 @@ function AnimeDetailsPage() {
         <meta property="og:image" content={animeData.bannerImage} />
       </Head>
 
-      <MainLayout useHead={false} banner={animeData.bannerImage} type="anime" showBrowseButtons={true}>
+      <MainLayout useHead={false} banner={animeData.bannerImage} type="anime">
         <ParticleBackground />
         <div className="px-8 py-8 relative z-10">
           {/* Back Button */}

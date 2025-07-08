@@ -25,7 +25,14 @@ export const getAnimeDetails = async (id) => {
       original: data.original_name,
     };
     const anilistId = await getAniListId(id.toString(), imdbId, animeTitle.english || animeTitle.original);
-    const streamingUrls = getAnimeStreamingUrls(imdbId, id.toString(), anilistId);
+    
+    // Get streaming URLs with Consumet API integration
+    const streamingUrls = await getAnimeStreamingUrls(
+      imdbId, 
+      id.toString(), 
+      anilistId, 
+      animeTitle.english || animeTitle.original
+    );
     
     return {
       id: data.id,
@@ -79,30 +86,35 @@ export const getAnimeEpisodes = async (id, season = 1) => {
     // Get AniList ID for anime-specific streaming
     const anilistId = await getAniListId(id.toString(), imdbId, animeTitle.english || animeTitle.original);
     
-    return data.episodes?.map(episode => {
-      const streamingUrls = getAnimeEpisodeStreamingUrls(
-        imdbId, 
-        id.toString(), 
-        season, 
-        episode.episode_number, 
-        anilistId,
-        animeTitle
-      );
-      
-      return {
-        id: episode.id,
-        title: episode.name,
-        episodeNumber: episode.episode_number,
-        seasonNumber: episode.season_number,
-        overview: episode.overview,
-        airDate: episode.air_date,
-        runtime: episode.runtime,
-        rating: episode.vote_average,
-        image: episode.still_path ? `${imageBaseUrl}${episode.still_path}` : null,
-        streaming: streamingUrls,
-        imdbId,
-      };
-    }) || [];
+    // Process episodes with async streaming URLs
+    const episodes = await Promise.all(
+      (data.episodes || []).map(async (episode) => {
+        const streamingUrls = await getAnimeEpisodeStreamingUrls(
+          imdbId, 
+          id.toString(), 
+          season, 
+          episode.episode_number, 
+          anilistId,
+          animeTitle
+        );
+        
+        return {
+          id: episode.id,
+          title: episode.name,
+          episodeNumber: episode.episode_number,
+          seasonNumber: episode.season_number,
+          overview: episode.overview,
+          airDate: episode.air_date,
+          runtime: episode.runtime,
+          rating: episode.vote_average,
+          image: episode.still_path ? `${imageBaseUrl}${episode.still_path}` : null,
+          streaming: streamingUrls,
+          imdbId,
+        };
+      })
+    );
+    
+    return episodes;
   } catch (error) {
     console.error('Error fetching anime episodes:', error);
     return [];

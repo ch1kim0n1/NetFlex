@@ -116,7 +116,7 @@ function WatchEpisode() {
 
   if (loading) {
     return (
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout>
         <Head>
           <title>Loading Episode - NetFlex</title>
         </Head>
@@ -132,7 +132,7 @@ function WatchEpisode() {
 
   if (error || !show || !currentEpisode) {
     return (
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout>
         <Head>
           <title>Episode Not Found - NetFlex</title>
         </Head>
@@ -152,7 +152,7 @@ function WatchEpisode() {
   }
 
   return (
-    <MainLayout showBrowseButtons={true}>
+    <MainLayout>
       <Head>
         <title>{show.title.english} - S{season}E{episode} - Watch on NetFlex</title>
         <meta name="description" content={`Watch ${show.title.english} Season ${season} Episode ${episode} on NetFlex. ${currentEpisode.overview}`} />

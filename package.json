@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@tawk.to/tawk-messenger-react": "^2.0.2",
     "@videojs/http-streaming": "^3.10.0",
     "@vidstack/react": "^1.11.29",

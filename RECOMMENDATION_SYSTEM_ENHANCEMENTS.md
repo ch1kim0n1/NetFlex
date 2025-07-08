@@ -139,6 +139,96 @@ The NetFlex recommendation system has been significantly upgraded from a basic g
    - Content freshness balancing
    - Diversity enforcement to prevent echo chambers
 
+## 🎥 Enhanced Anime Streaming with Consumet API
+
+### Consumet API Integration
+NetFlex now uses the **Consumet API** as the primary source for anime video streaming, providing:
+
+- **Multiple Provider Support**: Gogoanime, Zoro, AnimePahe, 9anime, and more
+- **Direct Video Sources**: High-quality direct streaming links (no more iframe limitations)
+- **Multiple Quality Options**: Auto-detection of 1080p, 720p, 480p, and 360p sources
+- **Subtitle Support**: Automatic subtitle detection and integration
+- **HLS Streaming**: Support for adaptive bitrate streaming via M3U8 playlists
+- **Fallback System**: Automatic source switching if primary sources fail
+
+### 📺 Anime Streaming Sources
+
+**Fixed URL Generation Issues:**
+- ❌ Removed fake embed URLs that didn't exist
+- ✅ Added working embed sources that can be embedded in iframes  
+- ✅ Added watch page URLs for premium sources
+- ✅ Fixed episode URL formatting to match actual site structures
+
+**Current Working Sources (Updated January 2025):**
+
+**🎬 Embed Sources (Can be embedded in player):**
+- VidSrc Anime - Reliable streaming with AniList ID support
+- AnimeFire - Fast loading with title-based URLs
+- KawaiiDesu - Clean interface with episode support
+
+**🌐 Watch Page Sources (Open in new tab):**
+- HiAnime.to - Premium quality streaming platform
+- GogoAnime.tw - Popular with good anime availability
+- 9anime.com.ro - Well-established streaming site  
+- AnimePahe.ru - High-quality compressed streaming
+
+**🔧 Technical Improvements:**
+- Fixed URL generation to use actual working formats
+- Separated embed sources from watch page sources
+- Added external link indicators for watch pages
+- Improved episode URL formatting (e.g., "/watch/anime-title-episode-1")
+- Better title encoding to match site expectations
+- Added support for both iframe embeds and external watch pages
+
+**🎯 Source Quality System:**
+- **DIRECT**: Consumet API direct video links (highest priority)
+- **PREMIUM**: Premium streaming platforms (HiAnime)
+- **HD+**: High-quality sources (GogoAnime, 9anime, AnimePahe) 
+- **HD**: Good quality sources (VidSrc, AnimeFire, KawaiiDesu)
+- **WATCH PAGE**: External links to streaming sites
+
+**📱 User Experience:**
+- Multiple working sources per anime (8-10 sources typical)
+- Clear source type indicators (Direct/Embed/Watch Page)
+- Automatic fallback if primary source fails
+- External links open in new tabs for premium sources
+- Quality badges help users choose best source
+
+### Key Features:
+1. **Smart Source Selection**: Prioritizes Consumet direct sources → Premium → High → Medium quality sources
+2. **Quality Auto-Selection**: Automatically selects the best available quality (1080p preferred)
+3. **Multi-Provider Redundancy**: 15+ anime sources for maximum availability and variety
+4. **Advanced Error Handling**: Auto-retry with alternative sources on playback failures
+5. **Real-time Subtitle Loading**: Dynamic subtitle track loading from various providers
+6. **Quality Indicators**: Visual quality badges (DIRECT, PREMIUM, HD+, HD) for easy source identification
+7. **Automatic Fallback**: If one source fails, automatically switches to the next available source
+
+### Technical Implementation:
+- **Consumet Utility Module** (`src/utils/consumetApi.js`): Centralized API handling with 15+ sources
+- **Enhanced Streaming Handler** (`src/handlers/streaming.js`): Integrated premium sources with Consumet
+- **Upgraded Player Component** (`components/anime/AnimeStreamingPlayer.jsx`): Support for quality indicators
+- **Comprehensive Search**: Multi-provider search with intelligent best-match selection
+
+### Supported Providers via Consumet:
+- **Gogoanime**: Primary source for most anime content
+- **Zoro**: Alternative high-quality source
+- **AnimePahe**: Compressed high-quality alternatives  
+- **9anime**: Additional reliable source
+- **Crunchyroll**: Official licensed content when available
+
+### Fallback Sources (High Variety - 15+ Sources):
+**Premium Tier**: HiAnime, AniWatch, AnimeKAI
+**High Quality Tier**: Anitaku, AniPlay, Anix, GogoAnime, 9anime
+**Medium Quality Tier**: VidSrc, AnimeFire, KawaiiDesu, AnimixPlay, AniCrush, KissAnime, AniLinkz
+
+### Source Priority System:
+1. **Consumet API Direct Sources** (DIRECT badge)
+2. **Premium Sources** (PREMIUM badge)
+3. **High Quality Sources** (HD+ badge)
+4. **Medium Quality Sources** (HD badge)
+
+This ensures users always get the best available source, with automatic fallback to alternatives if the primary source fails.
+
 ## 🔧 Technical Implementation
 
 ### Performance Optimizations

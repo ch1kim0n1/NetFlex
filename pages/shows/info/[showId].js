@@ -62,7 +62,7 @@ function ShowDetailsPage() {
 
   if (loading) {
     return (
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-netflix-white text-xl">Loading Show Details...</div>
         </div>
@@ -72,7 +72,7 @@ function ShowDetailsPage() {
 
   if (!showData) {
     return (
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-netflix-white text-xl">Show not found</div>
         </div>
@@ -93,7 +93,7 @@ function ShowDetailsPage() {
         <meta property="og:image" content={showData.bannerImage} />
       </Head>
 
-      <MainLayout useHead={false} banner={showData.bannerImage} type="shows" showBrowseButtons={true}>
+      <MainLayout useHead={false} banner={showData.bannerImage} type="shows">
         <ParticleBackground />
         <div className="px-8 py-8 relative z-10">
           {/* Back Button */}
