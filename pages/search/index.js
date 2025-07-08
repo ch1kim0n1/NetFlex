@@ -228,47 +228,47 @@ export default function GlobalSearch() {
         <meta name="description" content="Search and discover movies and TV shows on NetFlex. Advanced filters and sorting options." />
       </Head>
       
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout showBrowseButtons={false}>
         <ParticleBackground />
-        <div className="pt-8 space-y-8 relative z-10">
-          <div className="px-8">
+        <div className="pt-6 sm:pt-8 space-y-6 sm:space-y-8 relative z-10">
+          <div className="px-4 sm:px-6 lg:px-8">
             {/* Back Button */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <button 
                 onClick={() => router.back()}
                 className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
               >
                 <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
-                <span>Back</span>
+                <span className="text-sm sm:text-base">Back</span>
               </button>
             </div>
             
-            <h1 className="text-4xl font-bold text-netflix-white mb-4">Advanced Search</h1>
-            <p className="text-netflix-text-gray text-lg">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-netflix-white mb-3 sm:mb-4">Advanced Search</h1>
+            <p className="text-netflix-text-gray text-base sm:text-lg">
               Explore movies and TV shows with advanced filters and sorting options
             </p>
 
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative mb-6">
+            <form onSubmit={handleSearch} className="relative mb-4 sm:mb-6">
               <div className="relative">
-                <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-netflix-text-gray" />
+                <FaSearch className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-netflix-text-gray text-sm sm:text-base" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search movies and TV shows..."
-                  className="w-full bg-netflix-gray/20 border border-netflix-gray/40 rounded-lg pl-12 pr-4 py-3 text-netflix-white placeholder-netflix-text-gray focus:outline-none focus:border-netflix-red transition-colors"
+                  className="w-full bg-netflix-gray/20 border border-netflix-gray/40 rounded-lg pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 text-netflix-white placeholder-netflix-text-gray focus:outline-none focus:border-netflix-red transition-colors text-sm sm:text-base"
                 />
               </div>
             </form>
 
             {/* Filter Controls */}
-            <div className="flex flex-wrap items-center gap-4 mb-6">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center space-x-2 bg-netflix-gray/20 hover:bg-netflix-gray/30 text-netflix-white px-4 py-2 rounded-lg transition-colors"
+                className="flex items-center space-x-1 sm:space-x-2 bg-netflix-gray/20 hover:bg-netflix-gray/30 text-netflix-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
               >
-                <FaFilter />
+                <FaFilter className="text-xs sm:text-sm" />
                 <span>Filters</span>
               </button>
 
@@ -276,7 +276,7 @@ export default function GlobalSearch() {
               <select
                 value={contentType}
                 onChange={(e) => setContentType(e.target.value)}
-                className="bg-netflix-gray/20 border border-netflix-gray/40 text-netflix-white px-4 py-2 rounded-lg focus:outline-none focus:border-netflix-red"
+                className="bg-netflix-gray/20 border border-netflix-gray/40 text-netflix-white px-2 sm:px-4 py-2 rounded-lg focus:outline-none focus:border-netflix-red text-sm sm:text-base"
               >
                 <option value="all">All Content</option>
                 <option value="movies">Movies</option>
@@ -288,7 +288,7 @@ export default function GlobalSearch() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-netflix-gray/20 border border-netflix-gray/40 text-netflix-white px-4 py-2 rounded-lg focus:outline-none focus:border-netflix-red"
+                className="bg-netflix-gray/20 border border-netflix-gray/40 text-netflix-white px-2 sm:px-4 py-2 rounded-lg focus:outline-none focus:border-netflix-red text-sm sm:text-base"
               >
                 <option value="relevance">Sort by Relevance</option>
                 <option value="rating">Sort by Rating</option>
@@ -297,7 +297,7 @@ export default function GlobalSearch() {
               </select>
 
               {/* Results Count */}
-              <span className="text-netflix-text-gray">
+              <span className="text-netflix-text-gray text-sm sm:text-base">
                 {results.length} results
               </span>
             </div>
@@ -339,13 +339,13 @@ export default function GlobalSearch() {
           </div>
 
           {/* Results Grid */}
-          <div className="px-8">
+          <div className="px-4 sm:px-6 lg:px-8">
             {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="text-netflix-white text-xl">Loading...</div>
+              <div className="flex items-center justify-center py-16 sm:py-20">
+                <div className="text-netflix-white text-lg sm:text-xl">Loading...</div>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                 {results.map((item) => (
                   <div key={`${item.type}-${item.id}`}>
                                       {item.type === 'movie' ? (

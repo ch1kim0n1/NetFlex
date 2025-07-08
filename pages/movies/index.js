@@ -8,14 +8,13 @@ import RecentlyWatchedCard from "../../components/ui/RecentlyWatchedCard";
 import ParticleBackground from "../../components/ui/ParticleBackground";
 import GenreSelector from "../../components/ui/GenreSelector";
 import PersonalizedCategories from "../../components/ui/PersonalizedCategories";
-import { getPopularMovies, getTrendingMovies, getTopRatedMovies, getUpcomingMovies, getNowPlayingMovies, getMovieGenres, getMoviesByGenre } from "../../src/handlers/movies";
+import { getPopularMovies, getTopRatedMovies, getUpcomingMovies, getNowPlayingMovies, getMovieGenres, getMoviesByGenre } from "../../src/handlers/movies";
 import { getRecentlyWatchedMovies } from "../../src/utils/viewingHistory";
 import { FaArrowLeft } from 'react-icons/fa';
 
 export default function Movies() {
   const router = useRouter();
   const [popularMovies, setPopularMovies] = useState([]);
-  const [trendingMovies, setTrendingMovies] = useState([]);
   const [topRatedMovies, setTopRatedMovies] = useState([]);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
@@ -28,9 +27,8 @@ export default function Movies() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const [popular, trending, topRated, upcoming, nowPlaying, movieGenres] = await Promise.all([
+        const [popular, topRated, upcoming, nowPlaying, movieGenres] = await Promise.all([
           getPopularMovies(20),
-          getTrendingMovies(20),
           getTopRatedMovies(20),
           getUpcomingMovies(20),
           getNowPlayingMovies(20),
@@ -38,7 +36,6 @@ export default function Movies() {
         ]);
         
         setPopularMovies(popular);
-        setTrendingMovies(trending);
         setTopRatedMovies(topRated);
         setUpcomingMovies(upcoming);
         setNowPlayingMovies(nowPlaying);
@@ -95,22 +92,22 @@ export default function Movies() {
         <meta name="description" content="Watch the latest movies on NetFlex. From blockbuster hits to indie films." />
       </Head>
       
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout showBrowseButtons={false}>
         <ParticleBackground />
-        <div className="pt-8 space-y-8 relative z-10">
-          <div className="px-8">
-            <div className="mb-6">
+        <div className="pt-6 sm:pt-8 space-y-6 sm:space-y-8 relative z-10">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <div className="mb-4 sm:mb-6">
               <button 
                 onClick={() => router.push('/')}
                 className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
               >
                 <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
-                <span>Back to Home</span>
+                <span className="text-sm sm:text-base">Back to Home</span>
               </button>
             </div>
             
-            <h1 className="text-4xl font-bold text-netflix-white mb-4">Movies</h1>
-            <p className="text-netflix-text-gray text-lg">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-netflix-white mb-3 sm:mb-4">Movies</h1>
+            <p className="text-netflix-text-gray text-base sm:text-lg">
               From blockbuster hits to indie gems, discover your next favorite movie.
             </p>
           </div>
@@ -147,16 +144,6 @@ export default function Movies() {
 
           {/* Personalized Recommendations */}
           <PersonalizedCategories contentType="movie" limit={15} />
-
-          {trendingMovies.length > 0 && (
-            <ContentRow title="Trending Movies">
-              {trendingMovies.map((movie) => (
-                <div key={movie.id} className="flex-none w-60">
-                  <MovieCard data={movie} />
-                </div>
-              ))}
-            </ContentRow>
-          )}
 
           {nowPlayingMovies.length > 0 && (
             <ContentRow title="Now Playing">

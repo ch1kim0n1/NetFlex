@@ -53,7 +53,7 @@ export default function Trending() {
         <meta name="description" content="Discover what's trending on NetFlex. The hottest movies and TV shows everyone is watching." />
       </Head>
       
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout showBrowseButtons={false}>
         <ParticleBackground />
         <div className="pt-8 space-y-8 relative z-10">
           <div className="px-8">

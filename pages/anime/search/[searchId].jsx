@@ -106,41 +106,41 @@ export default function AnimeSearch() {
         <meta name="description" content={`Search results for "${searchQuery}" in anime on NetFlex`} />
       </Head>
       
-      <MainLayout>
+      <MainLayout showBrowseButtons={false} type={"anime"}>
         <ParticleBackground />
-        <div className="pt-8 space-y-8 relative z-10">
-          <div className="px-8">
-            <div className="mb-6">
+        <div className="pt-6 sm:pt-8 space-y-6 sm:space-y-8 relative z-10">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <div className="mb-4 sm:mb-6">
               <button 
                 onClick={() => router.push('/anime')}
                 className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
               >
                 <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
-                <span>Back to Anime</span>
+                <span className="text-sm sm:text-base">Back to Anime</span>
               </button>
             </div>
             
             {/* Search Header */}
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold text-netflix-white mb-4">
+            <div className="mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-netflix-white mb-3 sm:mb-4">
                 {searchQuery ? `Search Results for "${searchQuery}"` : 'Search Anime'}
               </h1>
               
               {/* Search Form */}
-              <form onSubmit={handleNewSearch} className="flex items-center space-x-4 max-w-2xl">
+              <form onSubmit={handleNewSearch} className="flex items-center space-x-2 sm:space-x-4 max-w-full sm:max-w-2xl">
                 <div className="flex-1 relative">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search for anime..."
-                    className="w-full bg-netflix-dark text-netflix-white px-4 py-3 pr-12 rounded-lg border border-netflix-gray focus:border-netflix-red focus:outline-none"
+                    className="w-full bg-netflix-dark text-netflix-white px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-12 rounded-lg border border-netflix-gray focus:border-netflix-red focus:outline-none text-sm sm:text-base"
                   />
                   <button
                     type="submit"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-netflix-text-gray hover:text-netflix-white transition-colors"
+                    className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-netflix-text-gray hover:text-netflix-white transition-colors"
                   >
-                    <FaSearch />
+                    <FaSearch className="text-sm sm:text-base" />
                   </button>
                 </div>
               </form>
@@ -148,8 +148,8 @@ export default function AnimeSearch() {
 
             {/* Results Count */}
             {!loading && (
-              <div className="mb-6">
-                <p className="text-netflix-text-gray">
+              <div className="mb-4 sm:mb-6">
+                <p className="text-netflix-text-gray text-sm sm:text-base">
                   {results.length > 0 
                     ? `Found ${results.length} anime${selectedGenre ? ` in ${genres.find(g => g.id === selectedGenre)?.name || 'selected genre'}` : ''}`
                     : 'No anime found'
@@ -161,47 +161,51 @@ export default function AnimeSearch() {
           </div>
 
           {/* Genre Filter */}
-          <GenreSelector 
-            genres={genres}
-            selectedGenre={selectedGenre}
-            onGenreSelect={handleGenreSelect}
-            type="anime"
-          />
+          <div className="px-4 sm:px-0">
+            <GenreSelector 
+              genres={genres}
+              selectedGenre={selectedGenre}
+              onGenreSelect={handleGenreSelect}
+              type="anime"
+            />
+          </div>
 
           {/* Loading State */}
           {loading && (
-            <div className="flex items-center justify-center py-16">
-              <div className="text-netflix-white text-xl">Searching anime...</div>
+            <div className="flex items-center justify-center py-12 sm:py-16">
+              <div className="text-netflix-white text-lg sm:text-xl">Searching anime...</div>
             </div>
           )}
 
           {/* Search Results */}
           {!loading && results.length > 0 && (
-            <ContentRow title={selectedGenre ? `${genres.find(g => g.id === selectedGenre)?.name || 'Genre'} Anime` : 'Search Results'}>
-              {results.map((anime) => (
-                <div key={anime.id} className="flex-none w-60">
-                  <AnimeCard data={anime} />
-                </div>
-              ))}
-            </ContentRow>
+            <div className="px-4 sm:px-0">
+              <ContentRow title={selectedGenre ? `${genres.find(g => g.id === selectedGenre)?.name || 'Genre'} Anime` : 'Search Results'}>
+                {results.map((anime) => (
+                  <div key={anime.id} className="flex-none w-48 sm:w-60">
+                    <AnimeCard data={anime} />
+                  </div>
+                ))}
+              </ContentRow>
+            </div>
           )}
 
           {/* No Results */}
           {!loading && results.length === 0 && searchQuery && (
-            <div className="flex flex-col items-center justify-center py-16 px-8">
+            <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-4 sm:px-8">
               <div className="text-center">
-                <FaSearch className="text-netflix-text-gray text-6xl mb-4 mx-auto" />
-                <h3 className="text-netflix-white text-2xl font-semibold mb-2">No anime found</h3>
-                <p className="text-netflix-text-gray text-lg mb-6">
+                <FaSearch className="text-netflix-text-gray text-4xl sm:text-6xl mb-3 sm:mb-4 mx-auto" />
+                <h3 className="text-netflix-white text-xl sm:text-2xl font-semibold mb-2">No anime found</h3>
+                <p className="text-netflix-text-gray text-base sm:text-lg mb-4 sm:mb-6 max-w-md">
                   We couldn't find any anime matching "{searchQuery}"
                   {selectedGenre && ` in ${genres.find(g => g.id === selectedGenre)?.name || 'the selected genre'}`}.
                 </p>
-                <div className="space-y-2">
-                  <p className="text-netflix-text-gray">Try:</p>
-                  <ul className="text-netflix-text-gray text-sm space-y-1">
+                <div className="space-y-1 sm:space-y-2">
+                  <p className="text-netflix-text-gray text-sm sm:text-base">Try:</p>
+                  <ul className="text-netflix-text-gray text-xs sm:text-sm space-y-1 max-w-sm mx-auto">
                     <li>• Checking your spelling</li>
                     <li>• Using different keywords</li>
-                    <li>• Searching for the original Japanese title</li>
+                    <li>• Browsing by genre instead</li>
                     <li>• Removing the genre filter</li>
                   </ul>
                 </div>

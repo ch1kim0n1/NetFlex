@@ -91,22 +91,22 @@ export default function Shows() {
         <meta name="description" content="Discover the best TV shows on NetFlex. From trending series to critically acclaimed dramas." />
       </Head>
       
-      <MainLayout showBrowseButtons={true}>
+      <MainLayout showBrowseButtons={false}>
         <ParticleBackground />
-        <div className="pt-8 space-y-8 relative z-10">
-          <div className="px-8">
-            <div className="mb-6">
+        <div className="pt-6 sm:pt-8 space-y-6 sm:space-y-8 relative z-10">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <div className="mb-4 sm:mb-6">
               <button 
                 onClick={() => router.push('/')}
                 className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
               >
                 <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
-                <span>Back to Home</span>
+                <span className="text-sm sm:text-base">Back to Home</span>
               </button>
             </div>
             
-            <h1 className="text-4xl font-bold text-netflix-white mb-4">TV Shows</h1>
-            <p className="text-netflix-text-gray text-lg">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-netflix-white mb-3 sm:mb-4">TV Shows</h1>
+            <p className="text-netflix-text-gray text-base sm:text-lg">
               Discover award-winning series, binge-worthy dramas, and trending shows.
             </p>
           </div>

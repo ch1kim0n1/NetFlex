@@ -31,7 +31,7 @@ function MovieSearchPage() {
 
   if (loading) {
     return (
-      <MainLayout>
+      <MainLayout showBrowseButtons={false} type={"movies"}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-netflix-white text-xl">Searching Movies...</div>
         </div>
@@ -57,31 +57,31 @@ function MovieSearchPage() {
         />
       </Head>
       
-      <MainLayout useHead={false} type={"movies"}>
-        <div className="pt-10 px-8">
+      <MainLayout useHead={false} type={"movies"} showBrowseButtons={false}>
+        <div className="pt-6 px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <button 
               onClick={() => router.back()}
               className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors group"
             >
               <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
-              <span>Back</span>
+              <span className="text-sm sm:text-base">Back</span>
             </button>
           </div>
 
-          <h1 className="text-netflix-white text-2xl font-bold mb-6">
+          <h1 className="text-netflix-white text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6">
             Search Results &gt; {searchId}
           </h1>
 
           {movieSearchData.length === 0 && (
-            <div className="text-center mt-10 text-2xl text-netflix-text-gray">
+            <div className="text-center mt-8 sm:mt-10 text-lg sm:text-xl lg:text-2xl text-netflix-text-gray">
               No Movies Found
             </div>
           )}
 
           {movieSearchData.length > 0 && (
-            <div className="pb-10 mt-5 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+            <div className="pb-8 sm:pb-10 mt-4 sm:mt-5 grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
               {movieSearchData.map((movie) => (
                 <MovieCard key={movie.id} data={movie} />
               ))}
