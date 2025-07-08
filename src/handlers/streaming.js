@@ -107,9 +107,9 @@ export const getAnimeStreamingUrls = (imdbId, tmdbId, anilistId = null) => {
     streamingUrls.primary = streamingUrls.vidsrc_anime; // Use anime-specific as primary
   }
 
-  // 2Embed anime source (works with anime title)
+  // 2Embed anime source with improved format
   if (tmdbId) {
-    streamingUrls.embed2 = `https://www.2embed.cc/embedanime/${tmdbId}`;
+    streamingUrls.embed2 = `https://www.2embed.cc/embedtv/${tmdbId}`;
     if (!streamingUrls.primary) {
       streamingUrls.primary = streamingUrls.embed2;
     }
@@ -154,18 +154,13 @@ export const getAnimeEpisodeStreamingUrls = (imdbId, tmdbId, season, episode, an
     streamingUrls.primary = streamingUrls.vidsrc_anime; // Use anime-specific as primary
   }
 
-  // 2Embed anime episode source
-  if (animeTitle && episode) {
-    const titleSlug = (animeTitle.english || animeTitle.original || '')
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '')
-      .replace(/\s+/g, '-');
+  // 2Embed anime episode source - Fixed URL format
+  if (tmdbId && season && episode) {
+    // Use the correct 2embed TV format for anime episodes
+    streamingUrls.embed2 = `https://www.2embed.cc/embedtv/${tmdbId}?s=${season}&e=${episode}`;
     
-    if (titleSlug) {
-      streamingUrls.embed2 = `https://2anime.xyz/embed/${titleSlug}-episode-${episode}`;
-      if (!streamingUrls.primary) {
-        streamingUrls.primary = streamingUrls.embed2;
-      }
+    if (!streamingUrls.primary) {
+      streamingUrls.primary = streamingUrls.embed2;
     }
   }
 

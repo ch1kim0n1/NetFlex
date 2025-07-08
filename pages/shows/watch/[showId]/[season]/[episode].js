@@ -6,7 +6,7 @@ import StreamingPlayer from '../../../../../components/StreamingPlayer';
 import SeasonEpisodeSelector from '../../../../../components/shows/SeasonEpisodeSelector';
 import { getShowDetails, getShowEpisodes, getShowSeasons } from '../../../../../src/handlers/shows';
 import { updateShowProgress } from '../../../../../src/utils/viewingHistory';
-import { FaArrowLeft, FaPlay, FaPlus, FaThumbsUp, FaShare, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaArrowLeft, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Link from 'next/link';
 
 function WatchEpisode() {
@@ -182,18 +182,7 @@ function WatchEpisode() {
               </div>
               
               <div className="flex items-center space-x-4">
-                <button className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors">
-                  <FaPlus />
-                  <span>My List</span>
-                </button>
-                <button className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors">
-                  <FaThumbsUp />
-                  <span>Like</span>
-                </button>
-                <button className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors">
-                  <FaShare />
-                  <span>Share</span>
-                </button>
+                
               </div>
             </div>
           </div>
@@ -361,4 +350,4 @@ function WatchEpisode() {
   );
 }
 
-export default WatchEpisode; 
+export default WatchEpisode;

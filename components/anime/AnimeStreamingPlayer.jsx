@@ -1,64 +1,82 @@
 import { useState, useEffect } from 'react';
-import { FaPlay, FaExchangeAlt, FaLanguage, FaClosedCaptioning } from 'react-icons/fa';
+import { FaPlay, FaExchangeAlt, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 
-function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season }) {
+function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season, animeId }) {
   const [currentSource, setCurrentSource] = useState('primary');
   const [showSourceSelector, setShowSourceSelector] = useState(false);
-  const [isDub, setIsDub] = useState(false);
-  const [skipIntro, setSkipIntro] = useState(true);
+  const [playerError, setPlayerError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
-  // Available streaming sources for anime
+  // Available streaming sources for anime with multiple 2embed formats
   const sources = [
     {
       id: 'vidsrc_anime',
       name: 'VidSrc Anime',
       description: 'Anime-specific player (Best quality)',
-      url: streamingUrls?.vidsrc_anime,
-      supportsOptions: true
+      url: streamingUrls?.vidsrc_anime
     },
     {
       id: 'embed2',
       name: '2Embed Anime',
       description: 'Alternative anime source',
-      url: streamingUrls?.embed2,
-      supportsOptions: false
+      url: streamingUrls?.embed2
+    },
+    {
+      id: 'embed2_alt1',
+      name: '2Embed Alt 1',
+      description: '2Embed alternative format',
+      url: animeId && season && episodeNumber 
+        ? `https://www.2embed.cc/embedanime/${animeId}?s=${season}&e=${episodeNumber}`
+        : null
+    },
+    {
+      id: 'embed2_alt2',
+      name: '2Embed Alt 2', 
+      description: '2Embed direct format',
+      url: animeId && season && episodeNumber
+        ? `https://www.2embed.cc/embed/tv?id=${animeId}&s=${season}&e=${episodeNumber}`
+        : null
     },
     {
       id: 'vidsrc_tv',
       name: 'VidSrc TV',
       description: 'General TV source (Fallback)',
-      url: streamingUrls?.vidsrc_tv,
-      supportsOptions: false
+      url: streamingUrls?.vidsrc_tv
     }
   ].filter(source => source.url);
 
-  // Get current streaming URL with options
+  // Get current streaming URL
   const getCurrentStreamingUrl = () => {
     const selectedSource = sources.find(s => s.id === currentSource);
-    if (!selectedSource) return streamingUrls?.primary;
-
-    let url = selectedSource.url;
-
-    // Apply anime-specific options for VidSrc Anime
-    if (selectedSource.id === 'vidsrc_anime' && url) {
-      // VidSrc anime format: /anime/{anilist_id}/{episode}/{dub}/{skip}
-      // Reconstruct URL with current options
-      const urlParts = url.split('/');
-      if (urlParts.length >= 6) {
-        const baseUrl = urlParts.slice(0, -2).join('/'); // Remove last two parts (dub/skip)
-        url = `${baseUrl}/${isDub ? '1' : '0'}${skipIntro ? '/1' : ''}`;
-      }
-    }
-
-    return url;
+    return selectedSource?.url || streamingUrls?.primary;
   };
 
   // Set default source
   useEffect(() => {
     if (sources.length > 0) {
       setCurrentSource(sources[0].id);
+      setPlayerError(false);
+      setRetryCount(0);
     }
   }, [streamingUrls]);
+
+  // Handle iframe load errors
+  const handleIframeError = () => {
+    setPlayerError(true);
+    
+    // Auto-retry with next source
+    if (retryCount < sources.length - 1) {
+      setTimeout(() => {
+        const currentIndex = sources.findIndex(s => s.id === currentSource);
+        const nextSource = sources[currentIndex + 1];
+        if (nextSource) {
+          setCurrentSource(nextSource.id);
+          setRetryCount(prev => prev + 1);
+          setPlayerError(false);
+        }
+      }, 2000);
+    }
+  };
 
   const currentStreamingUrl = getCurrentStreamingUrl();
 
@@ -82,39 +100,15 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
           <h3 className="text-netflix-white font-semibold">
             {animeTitle} - Episode {episodeNumber}
           </h3>
+          {playerError && (
+            <div className="flex items-center space-x-2 text-yellow-500">
+              <FaExclamationTriangle className="text-sm" />
+              <span className="text-sm">Auto-switching source...</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* Language Toggle */}
-          {sources.some(s => s.supportsOptions) && (
-            <button
-              onClick={() => setIsDub(!isDub)}
-              className={`flex items-center space-x-2 px-3 py-1 rounded-md text-sm transition-colors ${
-                isDub 
-                  ? 'bg-netflix-red text-netflix-white' 
-                  : 'bg-netflix-gray text-netflix-text-gray hover:bg-netflix-gray/80'
-              }`}
-            >
-              <FaLanguage />
-              <span>{isDub ? 'DUB' : 'SUB'}</span>
-            </button>
-          )}
-
-          {/* Skip Intro Toggle */}
-          {sources.some(s => s.supportsOptions) && (
-            <button
-              onClick={() => setSkipIntro(!skipIntro)}
-              className={`flex items-center space-x-2 px-3 py-1 rounded-md text-sm transition-colors ${
-                skipIntro 
-                  ? 'bg-netflix-red text-netflix-white' 
-                  : 'bg-netflix-gray text-netflix-text-gray hover:bg-netflix-gray/80'
-              }`}
-            >
-              <FaClosedCaptioning />
-              <span>Skip Intro</span>
-            </button>
-          )}
-
           {/* Source Selector */}
           <div className="relative">
             <button
@@ -122,7 +116,7 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
               className="flex items-center space-x-2 px-3 py-1 bg-netflix-gray text-netflix-white rounded-md hover:bg-netflix-gray/80 transition-colors text-sm"
             >
               <FaExchangeAlt />
-              <span>Source</span>
+              <span>Source ({sources.length})</span>
             </button>
 
             {showSourceSelector && (
@@ -135,6 +129,8 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
                       onClick={() => {
                         setCurrentSource(source.id);
                         setShowSourceSelector(false);
+                        setPlayerError(false);
+                        setRetryCount(0);
                       }}
                       className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
                         currentSource === source.id
@@ -155,26 +151,50 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
 
       {/* Video Player */}
       <div className="w-full aspect-video bg-netflix-black rounded-lg overflow-hidden">
-        <iframe
-          src={currentStreamingUrl}
-          className="w-full h-full"
-          allowFullScreen
-          frameBorder="0"
-          title={`${animeTitle} Episode ${episodeNumber}`}
-        />
+        {playerError ? (
+          <div className="w-full h-full flex items-center justify-center bg-netflix-dark">
+            <div className="text-center text-netflix-text-gray">
+              <FaExclamationTriangle className="text-4xl mb-4 mx-auto text-yellow-500" />
+              <p>Error loading this source</p>
+              <p className="text-sm mt-2">Trying next available source...</p>
+            </div>
+          </div>
+        ) : (
+          <iframe
+            src={currentStreamingUrl}
+            className="w-full h-full"
+            allowFullScreen
+            frameBorder="0"
+            title={`${animeTitle} Episode ${episodeNumber}`}
+            onError={handleIframeError}
+            onLoad={() => setPlayerError(false)}
+          />
+        )}
       </div>
 
       {/* Source Info */}
-      <div className="text-sm text-netflix-text-gray text-center">
-        Currently using: <span className="text-netflix-white font-medium">
-          {sources.find(s => s.id === currentSource)?.name || 'Default Source'}
-        </span>
-        {sources.find(s => s.id === currentSource)?.supportsOptions && (
-          <span className="ml-2">
-            • {isDub ? 'Dubbed' : 'Subtitled'} 
-            {skipIntro && ' • Skip Intro Enabled'}
-          </span>
-        )}
+      <div className="bg-netflix-dark rounded-lg p-4">
+        <div className="flex items-center space-x-3">
+          <FaInfoCircle className="text-netflix-red" />
+          <div className="text-netflix-text-gray text-sm">
+            <div className="mb-1">
+              <span className="font-medium">Currently using:</span> <span className="text-netflix-white">
+                {sources.find(s => s.id === currentSource)?.name || 'Default Source'}
+              </span>
+              {retryCount > 0 && (
+                <span className="text-yellow-500 ml-2">(Auto-switched {retryCount} time{retryCount > 1 ? 's' : ''})</span>
+              )}
+            </div>
+            <div className="mb-1">
+              <span className="font-medium">Available sources:</span> <span className="text-netflix-white">
+                {sources.length} sources detected
+              </span>
+            </div>
+            <div>
+              <span className="font-medium">Settings Notice:</span> Audio language (sub/dub), subtitles, and quality settings are managed directly by the video provider. Use the player controls within the video to adjust these settings.
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

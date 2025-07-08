@@ -6,7 +6,7 @@ import StreamingPlayer from '../../../components/StreamingPlayer';
 import { getMovieDetails } from '../../../src/handlers/movies';
 import { updateMovieProgress, invalidateRecommendationCache } from '../../../src/utils/viewingHistory';
 import { invalidateRecommendationCache as invalidateRecCache } from '../../../src/utils/recommendations';
-import { FaArrowLeft, FaPlay, FaPlus, FaThumbsUp, FaShare } from 'react-icons/fa';
+import { FaArrowLeft } from 'react-icons/fa';
 import Link from 'next/link';
 
 function WatchMovie() {
@@ -124,18 +124,7 @@ function WatchMovie() {
               </div>
               
               <div className="flex items-center space-x-4">
-                <button className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors">
-                  <FaPlus />
-                  <span>My List</span>
-                </button>
-                <button className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors">
-                  <FaThumbsUp />
-                  <span>Like</span>
-                </button>
-                <button className="flex items-center space-x-2 text-netflix-text-gray hover:text-netflix-white transition-colors">
-                  <FaShare />
-                  <span>Share</span>
-                </button>
+                
               </div>
             </div>
           </div>
@@ -259,4 +248,4 @@ function WatchMovie() {
   );
 }
 
-export default WatchMovie; 
+export default WatchMovie;

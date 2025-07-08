@@ -6,7 +6,7 @@ import AnimeStreamingPlayer from '../../../../../components/anime/AnimeStreaming
 import SeasonEpisodeSelector from '../../../../../components/shows/SeasonEpisodeSelector';
 import { getAnimeDetails, getAnimeEpisodes, getAnimeSeasons } from '../../../../../src/handlers/anime';
 import { updateShowProgress } from '../../../../../src/utils/viewingHistory';
-import { FaArrowLeft, FaPlay, FaPlus, FaThumbsUp, FaShare, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaArrowLeft, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Link from 'next/link';
 
 function WatchAnimeEpisode() {
@@ -167,15 +167,7 @@ function WatchAnimeEpisode() {
                 </div>
                 
                 <div className="flex items-center space-x-3">
-                  <button className="text-netflix-text-gray hover:text-netflix-white transition-colors">
-                    <FaPlus className="text-xl" />
-                  </button>
-                  <button className="text-netflix-text-gray hover:text-netflix-white transition-colors">
-                    <FaThumbsUp className="text-xl" />
-                  </button>
-                  <button className="text-netflix-text-gray hover:text-netflix-white transition-colors">
-                    <FaShare className="text-xl" />
-                  </button>
+                  
                 </div>
               </div>
             </div>
@@ -191,6 +183,7 @@ function WatchAnimeEpisode() {
                   animeTitle={anime.title?.english || anime.title?.original}
                   episodeNumber={parseInt(episode)}
                   season={parseInt(season)}
+                  animeId={animeId}
                 />
                 
                 {/* Episode Navigation */}
@@ -330,4 +323,4 @@ function WatchAnimeEpisode() {
   );
 }
 
-export default WatchAnimeEpisode; 
+export default WatchAnimeEpisode;
