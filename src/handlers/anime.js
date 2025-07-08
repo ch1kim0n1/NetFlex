@@ -1,4 +1,4 @@
-import { getAnimeStreamingUrls, getAnimeEpisodeStreamingUrls, extractImdbId } from './streaming.js';
+import { getAnimeStreamingUrls, getAnimeEpisodeStreamingUrls, extractImdbId, getAniListId } from './streaming.js';
 
 const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const baseUrl = 'https://api.themoviedb.org/3';
@@ -18,9 +18,14 @@ export const getAnimeDetails = async (id) => {
     const data = await animeResponse.json();
     const externalIds = await externalIdsResponse.json();
     
-    // Extract IMDB ID and generate streaming URLs
+    // Extract IMDB ID and get AniList ID for anime-specific streaming
     const imdbId = extractImdbId(externalIds);
-    const streamingUrls = getAnimeStreamingUrls(imdbId, id.toString());
+    const animeTitle = {
+      english: data.name,
+      original: data.original_name,
+    };
+    const anilistId = await getAniListId(id.toString(), imdbId, animeTitle.english || animeTitle.original);
+    const streamingUrls = getAnimeStreamingUrls(imdbId, id.toString(), anilistId);
     
     return {
       id: data.id,
@@ -60,11 +65,29 @@ export const getAnimeEpisodes = async (id, season = 1) => {
     const data = await episodesResponse.json();
     const externalIds = await externalIdsResponse.json();
     
-    // Extract IMDB ID for streaming URLs
+    // Extract IMDB ID for streaming URLs and get anime title
     const imdbId = extractImdbId(externalIds);
     
+    // Get anime title for episode streaming
+    const animeDetailsResponse = await fetch(`${baseUrl}/tv/${id}?api_key=${apiKey}&language=en-US`);
+    const animeDetails = await animeDetailsResponse.json();
+    const animeTitle = {
+      english: animeDetails.name,
+      original: animeDetails.original_name,
+    };
+    
+    // Get AniList ID for anime-specific streaming
+    const anilistId = await getAniListId(id.toString(), imdbId, animeTitle.english || animeTitle.original);
+    
     return data.episodes?.map(episode => {
-      const streamingUrls = getAnimeEpisodeStreamingUrls(imdbId, id.toString(), season, episode.episode_number);
+      const streamingUrls = getAnimeEpisodeStreamingUrls(
+        imdbId, 
+        id.toString(), 
+        season, 
+        episode.episode_number, 
+        anilistId,
+        animeTitle
+      );
       
       return {
         id: episode.id,

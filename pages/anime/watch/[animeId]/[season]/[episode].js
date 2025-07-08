@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import MainLayout from '../../../../../components/ui/MainLayout';
-import StreamingPlayer from '../../../../../components/StreamingPlayer';
+import AnimeStreamingPlayer from '../../../../../components/anime/AnimeStreamingPlayer';
 import SeasonEpisodeSelector from '../../../../../components/shows/SeasonEpisodeSelector';
 import { getAnimeDetails, getAnimeEpisodes, getAnimeSeasons } from '../../../../../src/handlers/anime';
 import { updateShowProgress } from '../../../../../src/utils/viewingHistory';
@@ -186,11 +186,11 @@ function WatchAnimeEpisode() {
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Streaming Player */}
               <div className="lg:col-span-2">
-                <StreamingPlayer 
+                <AnimeStreamingPlayer 
                   streamingUrls={currentEpisode.streaming}
-                  title={anime.title?.english || anime.title?.original}
-                  type="anime"
-                  episode={currentEpisode}
+                  animeTitle={anime.title?.english || anime.title?.original}
+                  episodeNumber={parseInt(episode)}
+                  season={parseInt(season)}
                 />
                 
                 {/* Episode Navigation */}
