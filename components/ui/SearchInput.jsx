@@ -48,6 +48,17 @@ const SearchInput = forwardRef(({ type }, ref) => {
         >
           Movies
         </button>
+        <button
+          type="button"
+          onClick={() => setSearchType("anime")}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+            searchType === "anime"
+              ? "bg-netflix-red text-netflix-white"
+              : "text-netflix-text-gray hover:text-netflix-white"
+          }`}
+        >
+          Anime
+        </button>
       </div>
 
       {/* Search Autocomplete */}

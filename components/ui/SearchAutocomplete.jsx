@@ -4,6 +4,7 @@ import { CgSearch } from 'react-icons/cg';
 import { FaFilm, FaTv, FaSpinner } from 'react-icons/fa';
 import { searchMovies } from '../../src/handlers/movies';
 import { searchShows } from '../../src/handlers/shows';
+import { searchAnime } from '../../src/handlers/anime';
 
 function SearchAutocomplete({ onClose, searchType = 'shows', autoFocus = false }) {
   const [query, setQuery] = useState('');
@@ -33,6 +34,8 @@ function SearchAutocomplete({ onClose, searchType = 'shows', autoFocus = false }
         
         if (searchType === 'movies') {
           results = await searchMovies(query.trim(), 8);
+        } else if (searchType === 'anime') {
+          results = await searchAnime(query.trim(), 8);
         } else {
           results = await searchShows(query.trim(), 8);
         }
