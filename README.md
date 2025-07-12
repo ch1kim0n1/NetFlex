@@ -6,6 +6,15 @@ A Netflix-style streaming web app with modern design and responsive layout.
 
 </div>
 
+## Last Update Screenshots
+
+
+<img width="2202" height="1750" alt="scr2" src="https://github.com/user-attachments/assets/fcce1a3a-537d-445c-81c3-b026580365b9" />
+<img width="2218" height="1776" alt="scr3" src="https://github.com/user-attachments/assets/827141a6-0e0d-4180-ad4b-58867f724c64" />
+<img width="2200" height="1840" alt="scr4" src="https://github.com/user-attachments/assets/634cc062-ff8a-41a4-8813-69717970a376" />
+<img width="2226" height="1856" alt="scr5" src="https://github.com/user-attachments/assets/42f0b235-60e1-491e-b115-0ffb3ca0b679" />
+<img width="2206" height="1750" alt="Screenshot 2025-07-11 215709" src="https://github.com/user-attachments/assets/a6cfe6ec-ac7f-4fef-a0f3-d03e6e45db90" />
+
 ## 🌟 Features
 
 - **Netflix-style Interface** - Modern, sleek design inspired by Netflix
