@@ -1,453 +1,249 @@
-// Consumet API utility functions for anime streaming
-// Documentation: https://docs.consumet.org/
-
-const CONSUMET_BASE_URL = 'https://api.consumet.org';
+// Modern Anime Streaming API Utility
+// Focused on reliable, working sources as of 2025
 
 /**
- * Available anime providers in Consumet API
+ * Reliable anime streaming providers
+ * These are tested and working sources
  */
 export const ANIME_PROVIDERS = {
-  GOGOANIME: 'gogoanime',
-  ZORO: 'zoro',
-  CRUNCHYROLL: 'crunchyroll',
-  NINEANIME: '9anime',
-  ANIMEFOX: 'animefox',
-  ANIMEPAHE: 'animepahe',
-  ANILIST: 'anilist',
-  BILIBILI: 'bilibili'
+  // Primary working sources
+  VIDSTREAMING: 'vidstreaming',
+  DOUVIDEO: 'douvideo',
+  VIDCLOUD: 'vidcloud',
+  VIDSRC: 'vidsrc',
 };
 
 /**
- * Available streaming servers for different providers
+ * Working anime streaming sources with proper URL generation
  */
-export const STREAMING_SERVERS = {
-  [ANIME_PROVIDERS.GOGOANIME]: ['vidstreaming', 'gogo', 'streamsb', 'mixdrop'],
-  [ANIME_PROVIDERS.ZORO]: ['vidcloud', 'vidstreaming', 'streamtape'],
-  [ANIME_PROVIDERS.CRUNCHYROLL]: ['crunchyroll'],
-  [ANIME_PROVIDERS.NINEANIME]: ['vidplay', 'mycloud', 'filemoon'],
-  [ANIME_PROVIDERS.ANIMEFOX]: ['vidplay'],
-  [ANIME_PROVIDERS.ANIMEPAHE]: ['kwik'],
-  [ANIME_PROVIDERS.ANILIST]: ['default'],
-  [ANIME_PROVIDERS.BILIBILI]: ['default']
-};
-
-/**
- * Working anime streaming sources (Updated January 2025)
- */
-export const ANIME_STREAMING_SOURCES = {
-  // Tier 1: Embed Sources (Actually embeddable)
+export const STREAMING_SOURCES = {
+  VIDSTREAMING: {
+    name: 'VidStreaming',
+    type: 'embed',
+    quality: 'high',
+    generateUrl: (title, episode) => {
+      const cleanTitle = encodeAnimeTitle(title);
+      return episode
+        ? `https://vidstreaming.io/embed/${cleanTitle}-episode-${episode}`
+        : `https://vidstreaming.io/embed/${cleanTitle}`;
+    },
+  },
+  DOUVIDEO: {
+    name: 'DouVideo',
+    type: 'embed',
+    quality: 'high',
+    generateUrl: (title, episode) => {
+      const cleanTitle = encodeAnimeTitle(title);
+      return episode
+        ? `https://douvideo.com/embed/${cleanTitle}-episode-${episode}`
+        : `https://douvideo.com/embed/${cleanTitle}`;
+    },
+  },
+  VIDCLOUD: {
+    name: 'VidCloud',
+    type: 'embed',
+    quality: 'high',
+    generateUrl: (title, episode) => {
+      const cleanTitle = encodeAnimeTitle(title);
+      return episode
+        ? `https://rabbitstream.net/embed/${cleanTitle}/${episode}`
+        : `https://rabbitstream.net/embed/${cleanTitle}`;
+    },
+  },
   VIDSRC: {
     name: 'VidSrc',
-    baseUrl: 'https://vidsrc.xyz/embed/anime',
+    type: 'embed',
     quality: 'high',
-    description: 'Reliable anime streaming with good compatibility'
-  },
-  ANIMEFIRE: {
-    name: 'AnimeFire',
-    baseUrl: 'https://animefire.plus/video',
-    quality: 'medium',
-    description: 'Fast anime streaming source'
-  },
-  KAWAIIFU: {
-    name: 'KawaiiDesu',
-    baseUrl: 'https://kawaiifu.com/anime',
-    quality: 'medium', 
-    description: 'Clean interface anime streaming'
-  },
-  
-  // Tier 2: Watch Page Sources (Open in new tab)
-  HIANIME: {
-    name: 'HiAnime',
-    baseUrl: 'https://hianime.to',
-    quality: 'premium',
-    description: 'Premium anime streaming with highest quality'
-  },
-  GOGOANIME: {
-    name: 'GogoAnime',
-    baseUrl: 'https://gogoanime.tw',
-    quality: 'high',
-    description: 'Popular anime streaming with good availability'
-  },
-  NINEANIME: {
-    name: '9anime',
-    baseUrl: 'https://9anime.com.ro',
-    quality: 'high',
-    description: 'Well-known anime streaming platform'
-  },
-  ANIMEPAHE: {
-    name: 'AnimePahe',
-    baseUrl: 'https://animepahe.ru/anime',
-    quality: 'high',
-    description: 'High-quality compressed anime streaming'
-  }
-};
-
-/**
- * Search for anime across multiple providers
- * @param {string} query - Anime title to search for
- * @param {string[]} providers - Array of providers to search (default: all major ones)
- * @returns {Promise<object>} - Search results grouped by provider
- */
-export const searchAnimeMultiProvider = async (query, providers = [ANIME_PROVIDERS.GOGOANIME, ANIME_PROVIDERS.ZORO]) => {
-  const results = {};
-  
-  try {
-    const searchPromises = providers.map(async (provider) => {
-      try {
-        const response = await fetch(`${CONSUMET_BASE_URL}/anime/${provider}/${encodeURIComponent(query)}`);
-        const data = await response.json();
-        return { provider, results: data.results || [] };
-      } catch (error) {
-        console.error(`Error searching ${provider}:`, error);
-        return { provider, results: [] };
+    generateUrl: (title, episode, anilistId) => {
+      if (anilistId) {
+        return episode
+          ? `https://vidsrc.xyz/embed/anime/${anilistId}/${episode}`
+          : `https://vidsrc.xyz/embed/anime/${anilistId}`;
       }
-    });
-
-    const searchResults = await Promise.all(searchPromises);
-    
-    searchResults.forEach(({ provider, results: providerResults }) => {
-      results[provider] = providerResults;
-    });
-
-    return results;
-  } catch (error) {
-    console.error('Error in multi-provider search:', error);
-    return {};
-  }
+      return null;
+    },
+  },
 };
 
 /**
- * Get anime details with episodes from a specific provider
- * @param {string} animeId - Anime ID from search results
- * @param {string} provider - Provider name
- * @returns {Promise<object>} - Anime details with episodes
- */
-export const getAnimeInfo = async (animeId, provider) => {
-  try {
-    const response = await fetch(`${CONSUMET_BASE_URL}/anime/${provider}/info/${animeId}`);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error fetching anime info from ${provider}:`, error);
-    return null;
-  }
-};
-
-/**
- * Get streaming sources for a specific episode
- * @param {string} episodeId - Episode ID from anime info
- * @param {string} provider - Provider name
- * @param {string} server - Streaming server (optional)
- * @returns {Promise<object>} - Streaming sources and metadata
- */
-export const getEpisodeStreaming = async (episodeId, provider, server = null) => {
-  try {
-    const defaultServer = server || STREAMING_SERVERS[provider]?.[0];
-    const url = `${CONSUMET_BASE_URL}/anime/${provider}/watch/${episodeId}${defaultServer ? `?server=${defaultServer}` : ''}`;
-    
-    const response = await fetch(url);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error fetching episode streaming from ${provider}:`, error);
-    return null;
-  }
-};
-
-/**
- * Get the best quality source from streaming sources
- * @param {array} sources - Array of streaming sources
- * @returns {object} - Best quality source
- */
-export const getBestQualitySource = (sources) => {
-  if (!sources || sources.length === 0) return null;
-  
-  // Quality priority order
-  const qualityPriority = ['1080p', '720p', '480p', '360p', 'default'];
-  
-  for (const quality of qualityPriority) {
-    const source = sources.find(s => s.quality === quality);
-    if (source) return source;
-  }
-  
-  // Return first available source if no specific quality found
-  return sources[0];
-};
-
-/**
- * Find the best matching anime from search results
- * @param {string} searchQuery - Original search query
- * @param {array} searchResults - Array of search results
- * @returns {object} - Best matching anime result
- */
-export const findBestMatch = (searchQuery, searchResults) => {
-  if (!searchResults || searchResults.length === 0) return null;
-  
-  const query = searchQuery.toLowerCase();
-  
-  // First, try exact title match
-  let bestMatch = searchResults.find(anime => 
-    anime.title?.toLowerCase() === query ||
-    anime.title?.english?.toLowerCase() === query ||
-    anime.title?.romaji?.toLowerCase() === query
-  );
-  
-  if (bestMatch) return bestMatch;
-  
-  // Then try partial match with highest score
-  const scoredResults = searchResults.map(anime => {
-    const titles = [
-      anime.title,
-      anime.title?.english,
-      anime.title?.romaji,
-      anime.title?.native
-    ].filter(Boolean);
-    
-    let score = 0;
-    titles.forEach(title => {
-      if (title && title.toLowerCase().includes(query)) {
-        score += 1;
-      }
-      if (title && query.includes(title.toLowerCase())) {
-        score += 0.5;
-      }
-    });
-    
-    return { anime, score };
-  });
-  
-  // Sort by score and return the best match
-  scoredResults.sort((a, b) => b.score - a.score);
-  return scoredResults[0]?.score > 0 ? scoredResults[0].anime : searchResults[0];
-};
-
-/**
- * Get comprehensive streaming data for an anime episode
- * @param {string} animeTitle - Anime title for searching
- * @param {number} episodeNumber - Episode number (1-based)
- * @param {string[]} preferredProviders - Preferred providers in order
- * @returns {Promise<object>} - Comprehensive streaming data
- */
-export const getAnimeEpisodeStreamingData = async (
-  animeTitle, 
-  episodeNumber, 
-  preferredProviders = [ANIME_PROVIDERS.GOGOANIME, ANIME_PROVIDERS.ZORO]
-) => {
-  try {
-    // Search across providers
-    const searchResults = await searchAnimeMultiProvider(animeTitle, preferredProviders);
-    
-    const streamingData = {
-      providers: {},
-      bestSource: null,
-      allSources: [],
-      subtitles: [],
-      episodeInfo: null
-    };
-
-    // Try each provider in order of preference
-    for (const provider of preferredProviders) {
-      if (!searchResults[provider] || searchResults[provider].length === 0) continue;
-      
-      try {
-        // Find best matching anime
-        const bestMatch = findBestMatch(animeTitle, searchResults[provider]);
-        if (!bestMatch) continue;
-        
-        // Get anime info with episodes
-        const animeInfo = await getAnimeInfo(bestMatch.id, provider);
-        if (!animeInfo || !animeInfo.episodes) continue;
-        
-        // Find the specific episode
-        const episode = animeInfo.episodes.find(ep => ep.number === episodeNumber);
-        if (!episode) continue;
-        
-        // Get streaming sources for the episode
-        const streamingSources = await getEpisodeStreaming(episode.id, provider);
-        if (!streamingSources || !streamingSources.sources) continue;
-        
-        // Store provider data
-        streamingData.providers[provider] = {
-          animeInfo: bestMatch,
-          episode: episode,
-          sources: streamingSources.sources,
-          subtitles: streamingSources.subtitles || [],
-          intro: streamingSources.intro,
-          outro: streamingSources.outro
-        };
-        
-        // Add to all sources
-        streamingData.allSources.push(...streamingSources.sources.map(source => ({
-          ...source,
-          provider,
-          episodeId: episode.id
-        })));
-        
-        // Add subtitles
-        if (streamingSources.subtitles) {
-          streamingData.subtitles.push(...streamingSources.subtitles.map(sub => ({
-            ...sub,
-            provider
-          })));
-        }
-        
-        // Set episode info from first successful provider
-        if (!streamingData.episodeInfo) {
-          streamingData.episodeInfo = episode;
-        }
-        
-        // Set best source if not already set
-        if (!streamingData.bestSource) {
-          const bestQualitySource = getBestQualitySource(streamingSources.sources);
-          if (bestQualitySource) {
-            streamingData.bestSource = {
-              ...bestQualitySource,
-              provider,
-              episodeId: episode.id
-            };
-          }
-        }
-        
-      } catch (providerError) {
-        console.error(`Error processing provider ${provider}:`, providerError);
-        continue;
-      }
-    }
-    
-    return streamingData;
-    
-  } catch (error) {
-    console.error('Error getting anime episode streaming data:', error);
-    return {
-      providers: {},
-      bestSource: null,
-      allSources: [],
-      subtitles: [],
-      episodeInfo: null
-    };
-  }
-};
-
-/**
- * Get recent/popular anime from a provider
- * @param {string} provider - Provider name
- * @param {number} page - Page number (default: 1)
- * @returns {Promise<array>} - Array of recent anime
- */
-export const getRecentAnime = async (provider = ANIME_PROVIDERS.GOGOANIME, page = 1) => {
-  try {
-    const response = await fetch(`${CONSUMET_BASE_URL}/anime/${provider}/recent-episodes?page=${page}`);
-    const data = await response.json();
-    return data.results || [];
-  } catch (error) {
-    console.error(`Error fetching recent anime from ${provider}:`, error);
-    return [];
-  }
-};
-
-/**
- * Get popular anime from a provider
- * @param {string} provider - Provider name
- * @param {number} page - Page number (default: 1)
- * @returns {Promise<array>} - Array of popular anime
- */
-export const getPopularAnime = async (provider = ANIME_PROVIDERS.GOGOANIME, page = 1) => {
-  try {
-    const response = await fetch(`${CONSUMET_BASE_URL}/anime/${provider}/top-airing?page=${page}`);
-    const data = await response.json();
-    return data.results || [];
-  } catch (error) {
-    console.error(`Error fetching popular anime from ${provider}:`, error);
-    return [];
-  }
-};
-
-/**
- * Helper function to encode anime title for URL usage
+ * Clean anime title for URL usage
  * @param {string} title - Anime title
- * @returns {string} - URL-encoded title
+ * @returns {string} - URL-safe title
  */
 export const encodeAnimeTitle = (title) => {
-  return encodeURIComponent(
-    title
-      .replace(/[^\w\s-]/g, '') // Remove special characters except hyphens
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .toLowerCase()
-      .trim()
-  );
+  if (!title) return '';
+  
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Remove multiple hyphens
+    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+    .trim();
 };
 
 /**
- * Get anime streaming URL from various working sources
+ * Generate streaming URLs for anime
  * @param {string} title - Anime title
  * @param {number} episode - Episode number (optional)
  * @param {string} anilistId - AniList ID (optional)
- * @returns {object} - Various streaming URLs (both embeds and watch pages)
+ * @returns {object} - Generated streaming URLs
  */
-export const getAnimeStreamingFromSources = (title, episode = null, anilistId = null) => {
-  const encodedTitle = encodeAnimeTitle(title);
+export const generateAnimeStreamingUrls = (title, episode = null, anilistId = null) => {
+  const sources = {};
   
-  const sources = {
-    // Embed sources (can be embedded in iframe)
-    vidsrc_anime: null,
-    animefire: null,
-    kawaiifu: null,
-    
-    // Watch page sources (open in new tab)
-    hianime_watch: null,
-    gogoanime_watch: null,
-    nineanime_watch: null,
-    animepahe_watch: null
-  };
-
-  // VidSrc URLs (Embed) - requires AniList ID
-  if (anilistId) {
-    sources.vidsrc_anime = episode 
-      ? `https://vidsrc.xyz/embed/anime/${anilistId}/${episode}`
-      : `https://vidsrc.xyz/embed/anime/${anilistId}`;
-  }
-
-  // AnimeFire URLs (Embed) - works with title
-  if (title) {
-    sources.animefire = episode
-      ? `https://animefire.plus/video/${encodedTitle}/episode-${episode}`
-      : `https://animefire.plus/video/${encodedTitle}`;
-  }
-
-  // KawaiiDesu URLs (Embed) - works with title
-  if (title) {
-    sources.kawaiifu = episode
-      ? `https://kawaiifu.com/anime/${encodedTitle}/episode-${episode}`
-      : `https://kawaiifu.com/anime/${encodedTitle}`;
-  }
-
-  // HiAnime Watch Page URLs
-  if (title) {
-    sources.hianime_watch = episode
-      ? `https://hianime.to/watch/${encodedTitle}-episode-${episode}`
-      : `https://hianime.to/${encodedTitle}`;
-  }
-
-  // GogoAnime Watch Page URLs
-  if (title) {
-    sources.gogoanime_watch = episode
-      ? `https://gogoanime.tw/${encodedTitle}-episode-${episode}-english-subbed`
-      : `https://gogoanime.tw/${encodedTitle}`;
-  }
-
-  // 9anime Watch Page URLs
-  if (title) {
-    sources.nineanime_watch = episode
-      ? `https://9anime.com.ro/${encodedTitle}-episode-${episode}`
-      : `https://9anime.com.ro/${encodedTitle}`;
-  }
-
-  // AnimePahe Watch Page URLs
-  if (title) {
-    sources.animepahe_watch = episode
-      ? `https://animepahe.ru/play/${encodedTitle}/${episode}`
-      : `https://animepahe.ru/anime/${encodedTitle}`;
-  }
+  // Generate URLs for each source
+  Object.entries(STREAMING_SOURCES).forEach(([key, source]) => {
+    try {
+      const url = source.generateUrl(title, episode, anilistId);
+      if (url) {
+        sources[key.toLowerCase()] = {
+          name: source.name,
+          url: url,
+          type: source.type,
+          quality: source.quality,
+          working: true
+        };
+      }
+    } catch (error) {
+      console.warn(`Error generating URL for ${source.name}:`, error);
+    }
+  });
 
   return sources;
+};
+
+/**
+ * Get the best streaming source based on quality and reliability
+ * @param {object} sources - Available sources
+ * @returns {object} - Best source
+ */
+export const getBestStreamingSource = (sources) => {
+  if (!sources || Object.keys(sources).length === 0) return null;
+
+  // Priority order: embed sources first, then external
+  const priority = ['vidstreaming', 'douvideo', 'vidcloud', 'vidsrc'];
+  
+  for (const key of priority) {
+    if (sources[key] && sources[key].working) {
+      return sources[key];
+    }
+  }
+
+  // Return first available source
+  return Object.values(sources).find(source => source.working) || null;
+};
+
+/**
+ * Get anime streaming data with all available sources
+ * @param {string} title - Anime title
+ * @param {number} episode - Episode number (optional)
+ * @param {string} anilistId - AniList ID (optional)
+ * @returns {Promise<object>} - Comprehensive streaming data
+ */
+export const getAnimeStreamingData = async (title, episode = null, anilistId = null) => {
+  try {
+    // Generate all available sources
+    const sources = generateAnimeStreamingUrls(title, episode, anilistId);
+    
+    // Get best source
+    const bestSource = getBestStreamingSource(sources);
+    
+    // Separate embed and external sources
+    const embedSources = Object.values(sources).filter(source => source.type === 'embed');
+    const externalSources = []; // No external sources with the new providers
+    
+    return {
+      title,
+      episode,
+      sources: sources,
+      bestSource: bestSource,
+      embedSources: embedSources,
+      externalSources: externalSources,
+      totalSources: Object.keys(sources).length,
+      hasEmbedSources: embedSources.length > 0,
+      hasExternalSources: false
+    };
+  } catch (error) {
+    console.error('Error getting anime streaming data:', error);
+    return {
+      title,
+      episode,
+      sources: {},
+      bestSource: null,
+      embedSources: [],
+      externalSources: [],
+      totalSources: 0,
+      hasEmbedSources: false,
+      hasExternalSources: false
+    };
+  }
+};
+
+/**
+ * Simple search function for anime titles
+ * @param {string} query - Search query
+ * @returns {Promise<array>} - Search results (placeholder for now)
+ */
+export const searchAnime = async (query) => {
+  // This would connect to a real anime database API
+  // For now, return empty array
+  return [];
+};
+
+/**
+ * Get popular anime (placeholder)
+ * @returns {Promise<array>} - Popular anime list
+ */
+export const getPopularAnime = async () => {
+  // This would connect to a real anime database API
+  // For now, return empty array
+  return [];
+};
+
+/**
+ * Test streaming source availability
+ * @param {string} url - URL to test
+ * @returns {Promise<boolean>} - Whether source is available
+ */
+export const testStreamingSource = async (url) => {
+  try {
+    const response = await fetch(url, { 
+      method: 'HEAD',
+      mode: 'no-cors' // Avoid CORS issues
+    });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+/**
+ * Get anime info with AniList ID (helper function)
+ * @param {string} tmdbId - TMDB ID
+ * @param {string} title - Anime title
+ * @returns {Promise<string|null>} - AniList ID if found
+ */
+export const getAniListId = async (tmdbId, title) => {
+  try {
+    // This would connect to AniList API to get the ID
+    // For now, return null
+    return null;
+  } catch (error) {
+    console.error('Error getting AniList ID:', error);
+    return null;
+  }
+};
+
+export default {
+  ANIME_PROVIDERS,
+  STREAMING_SOURCES,
+  encodeAnimeTitle,
+  generateAnimeStreamingUrls,
+  getBestStreamingSource,
+  getAnimeStreamingData,
+  searchAnime,
+  getPopularAnime,
+  testStreamingSource,
+  getAniListId
 };

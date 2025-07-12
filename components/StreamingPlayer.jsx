@@ -1,27 +1,106 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FaPlay, FaInfoCircle } from 'react-icons/fa';
+import { FaPlay, FaInfoCircle, FaExchangeAlt, FaExclamationTriangle } from 'react-icons/fa';
 
 function StreamingPlayer({ streamingUrls, title, type = 'movie', episode = null }) {
   const [currentSource, setCurrentSource] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [directVideoUrl, setDirectVideoUrl] = useState(null);
+  const [useProxy, setUseProxy] = useState(false);
 
   // Available streaming sources
   const sources = useMemo(() => [
-    { name: 'VidSrc', url: streamingUrls?.vidsrc },
-    { name: 'AutoEmbed', url: streamingUrls?.autoembed },
+    { 
+      name: 'VidSrc', 
+      url: streamingUrls?.vidsrc,
+      type: 'iframe',
+      priority: 1
+    },
+    { 
+      name: 'AutoEmbed', 
+      url: streamingUrls?.autoembed,
+      type: 'iframe', 
+      priority: 2
+    },
+    { 
+      name: 'VidSrc (Proxy)', 
+      url: streamingUrls?.vidsrc,
+      type: 'proxy',
+      priority: 3
+    },
   ].filter(source => source.url), [streamingUrls]);
 
   const [iframeUrl, setIframeUrl] = useState('');
 
-  useEffect(() => {
-    const baseUrl = sources[currentSource]?.url;
-    if (!baseUrl) {
-      setIframeUrl('');
-      return;
+  // Attempt to extract direct video URL from vidsrc
+  const extractDirectVideoUrl = async (vidsrcUrl) => {
+    try {
+      console.log('[StreamingPlayer] Attempting to extract direct video URL from:', vidsrcUrl);
+      
+      // Use our proxy to fetch the vidsrc page
+      const proxyUrl = `/api/proxy?url=${encodeURIComponent(vidsrcUrl)}`;
+      const response = await fetch(proxyUrl);
+      
+      if (!response.ok) {
+        throw new Error(`Proxy failed: ${response.status}`);
+      }
+      
+      const html = await response.text();
+      
+      // Look for m3u8 URLs in the HTML
+      const m3u8Regex = /(https?:\/\/[^\s"']+\.m3u8[^\s"']*)/gi;
+      const matches = html.match(m3u8Regex);
+      
+      if (matches && matches.length > 0) {
+        // Return the first m3u8 URL found, proxied through our API
+        const directUrl = matches[0];
+        const proxiedUrl = `/api/proxy?url=${encodeURIComponent(directUrl)}`;
+        console.log('[StreamingPlayer] Found direct video URL:', directUrl);
+        return proxiedUrl;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('[StreamingPlayer] Error extracting direct video URL:', error);
+      return null;
     }
+  };
 
-    setIframeUrl(baseUrl);
+  useEffect(() => {
+    const loadSource = async () => {
+      const currentSourceData = sources[currentSource];
+      if (!currentSourceData?.url) {
+        setIframeUrl('');
+        setDirectVideoUrl(null);
+        return;
+      }
+
+      setIsLoading(true);
+      setHasError(false);
+
+      if (currentSourceData.type === 'proxy') {
+        // Try to extract direct video URL
+        const videoUrl = await extractDirectVideoUrl(currentSourceData.url);
+        if (videoUrl) {
+          setDirectVideoUrl(videoUrl);
+          setIframeUrl('');
+          setUseProxy(true);
+        } else {
+          // Fallback to iframe if direct extraction fails
+          setIframeUrl(currentSourceData.url);
+          setDirectVideoUrl(null);
+          setUseProxy(false);
+        }
+      } else {
+        // Regular iframe source
+        setIframeUrl(currentSourceData.url);
+        setDirectVideoUrl(null);
+        setUseProxy(false);
+      }
+    };
+
+    loadSource();
   }, [currentSource, sources]);
 
   if (!sources.length) {
@@ -42,15 +121,40 @@ function StreamingPlayer({ streamingUrls, title, type = 'movie', episode = null 
     setCurrentSource(index);
     setIsLoading(true);
     setHasError(false);
+    setRetryCount(0);
   };
 
   const handleIframeLoad = () => {
     setIsLoading(false);
+    setRetryCount(0);
   };
 
   const handleIframeError = () => {
     setIsLoading(false);
     setHasError(true);
+    
+    // Auto-retry with next source after a delay
+    if (retryCount < sources.length - 1) {
+      setTimeout(() => {
+        console.log('[StreamingPlayer] Auto-switching to next source due to error');
+        setRetryCount(prev => prev + 1);
+        handleSourceChange((currentSource + 1) % sources.length);
+      }, 2000);
+    }
+  };
+
+  const handleVideoError = () => {
+    console.error('[StreamingPlayer] Video playback error');
+    setHasError(true);
+    
+    // Auto-retry with next source
+    if (retryCount < sources.length - 1) {
+      setTimeout(() => {
+        console.log('[StreamingPlayer] Auto-switching to next source due to video error');
+        setRetryCount(prev => prev + 1);
+        handleSourceChange((currentSource + 1) % sources.length);
+      }, 2000);
+    }
   };
 
   return (
@@ -67,6 +171,18 @@ function StreamingPlayer({ streamingUrls, title, type = 'movie', episode = null 
                 </span>
               )}
             </h3>
+            {retryCount > 0 && (
+              <div className="flex items-center space-x-2 text-yellow-500">
+                <FaExclamationTriangle className="text-sm" />
+                <span className="text-sm">Auto-switched {retryCount} time{retryCount > 1 ? 's' : ''}</span>
+              </div>
+            )}
+            {useProxy && (
+              <div className="flex items-center space-x-2 text-green-500">
+                <FaExchangeAlt className="text-sm" />
+                <span className="text-sm">Direct Stream</span>
+              </div>
+            )}
           </div>
           
           {/* Controls */}
@@ -78,7 +194,10 @@ function StreamingPlayer({ streamingUrls, title, type = 'movie', episode = null 
               className="bg-netflix-gray text-netflix-white px-3 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-netflix-red"
             >
               {sources.map((source, index) => (
-                <option key={index} value={index}>{source.name}</option>
+                <option key={index} value={index}>
+                  {source.name}
+                  {source.type === 'proxy' && ' (Enhanced)'}
+                </option>
               ))}
             </select>
           </div>
@@ -117,7 +236,23 @@ function StreamingPlayer({ streamingUrls, title, type = 'movie', episode = null 
         )}
 
         {/* Streaming Player */}
-        {iframeUrl && (
+        {directVideoUrl ? (
+          // Direct video player for proxied streams
+          <video
+            src={directVideoUrl}
+            className="absolute inset-0 w-full h-full"
+            controls
+            autoPlay
+            onError={handleVideoError}
+            onLoadStart={() => setIsLoading(true)}
+            onLoadedData={() => setIsLoading(false)}
+            onCanPlay={() => setIsLoading(false)}
+            crossOrigin="anonymous"
+          >
+            Your browser does not support the video tag.
+          </video>
+        ) : iframeUrl && (
+          // Iframe player for regular embed sources
           <iframe
             src={iframeUrl}
             key={iframeUrl}
@@ -137,9 +272,20 @@ function StreamingPlayer({ streamingUrls, title, type = 'movie', episode = null 
           <div className="flex items-center space-x-3">
             <FaInfoCircle className="text-netflix-red" />
             <div className="text-netflix-text-gray text-sm">
-              <span className="font-medium">Settings Notice:</span> Audio, subtitles, and quality settings are managed directly by the video provider. Use the player controls within the video to adjust these settings.
+              <span className="font-medium">
+                {useProxy ? 'Enhanced Streaming:' : 'Settings Notice:'}
+              </span> 
+              {useProxy 
+                ? ' Direct video stream with full browser controls and better compatibility.'
+                : ' Audio, subtitles, and quality settings are managed directly by the video provider. Use the player controls within the video to adjust these settings.'
+              }
             </div>
           </div>
+          {sources.length > 1 && (
+            <div className="text-netflix-text-gray text-xs">
+              {currentSource + 1} of {sources.length} sources
+            </div>
+          )}
         </div>
       </div>
 

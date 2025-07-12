@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import MainLayout from '../../../../../components/ui/MainLayout';
-import StreamingPlayer from '../../../../../components/StreamingPlayer';
+import EnhancedStreamingPlayer from '../../../../../components/EnhancedStreamingPlayer';
 import SeasonEpisodeSelector from '../../../../../components/shows/SeasonEpisodeSelector';
 import { getShowDetails, getShowEpisodes, getShowSeasons } from '../../../../../src/handlers/shows';
 import { updateShowProgress } from '../../../../../src/utils/viewingHistory';
@@ -193,7 +193,7 @@ function WatchEpisode() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Streaming Player */}
             <div className="lg:col-span-2">
-              <StreamingPlayer 
+              <EnhancedStreamingPlayer 
                 streamingUrls={currentEpisode.streaming}
                 title={show.title.english}
                 type="tv"

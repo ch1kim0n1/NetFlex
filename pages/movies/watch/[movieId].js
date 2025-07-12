@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import MainLayout from '../../../components/ui/MainLayout';
-import StreamingPlayer from '../../../components/StreamingPlayer';
+import EnhancedStreamingPlayer from '../../../components/EnhancedStreamingPlayer';
 import { getMovieDetails } from '../../../src/handlers/movies';
 import { updateMovieProgress, invalidateRecommendationCache } from '../../../src/utils/viewingHistory';
 import { invalidateRecommendationCache as invalidateRecCache } from '../../../src/utils/recommendations';
@@ -135,7 +135,7 @@ function WatchMovie() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Streaming Player */}
             <div className="lg:col-span-2">
-              <StreamingPlayer 
+              <EnhancedStreamingPlayer 
                 streamingUrls={movie.streaming}
                 title={movie.title.english}
                 type="movie"

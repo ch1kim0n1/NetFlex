@@ -17,7 +17,7 @@
     "eslint-config-next": "^14.1.4",
     "framer-motion": "^12.23.0",
     "gsap": "^3.13.0",
-    "hls.js": "^1.5.13",
+    "hls.js": "^1.6.7",
     "isomorphic-dompurify": "^2.11.0",
     "next": "^14.1.4",
     "npm": "^10.5.0",

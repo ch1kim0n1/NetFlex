@@ -1,94 +1,59 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaExpand, FaCompress, FaCog, FaExternalLinkAlt, FaChevronDown, FaTimes, FaExchangeAlt, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaPlay, FaExternalLinkAlt, FaExchangeAlt, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 
 function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season, animeId }) {
-  const [currentSource, setCurrentSource] = useState('primary');
+  const [currentSource, setCurrentSource] = useState(null);
   const [showSourceSelector, setShowSourceSelector] = useState(false);
-  const [showQualitySelector, setShowQualitySelector] = useState(false);
   const [playerError, setPlayerError] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-  const [currentQuality, setCurrentQuality] = useState('auto');
-  const [consumetData, setConsumetData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentVideoUrl, setCurrentVideoUrl] = useState('');
-  const [availableQualities, setAvailableQualities] = useState([]);
-  const [subtitles, setSubtitles] = useState([]);
-  const videoRef = useRef(null);
 
-  // Extract Consumet streaming data
-  useEffect(() => {
-    if (streamingUrls?.consumet_data) {
-      setConsumetData(streamingUrls.consumet_data);
-    } else if (streamingUrls?.primary?.bestSource) {
-      setConsumetData(streamingUrls.primary);
-    }
-  }, [streamingUrls]);
-
-  // Available streaming sources for anime with working URLs
+  // Available streaming sources with proper priority
   const sources = [
-    // Consumet API sources (direct video links) - prioritize these
-    ...(streamingUrls?.consumet_data?.providers?.gogoanime ? [{
-      id: 'consumet_gogoanime',
-      name: 'Gogoanime (Direct)',
-      description: 'Direct video via Consumet API - Gogoanime',
-      type: 'direct',
-      data: streamingUrls.consumet_data.providers.gogoanime
-    }] : []),
-    ...(streamingUrls?.consumet_data?.providers?.zoro ? [{
-      id: 'consumet_zoro', 
-      name: 'Zoro (Direct)',
-      description: 'Direct video via Consumet API - Zoro',
-      type: 'direct',
-      data: streamingUrls.consumet_data.providers.zoro
-    }] : []),
-    ...(streamingUrls?.consumet_data?.providers?.animepahe ? [{
-      id: 'consumet_animepahe',
-      name: 'AnimePahe (Direct)',
-      description: 'Direct video via Consumet API - AnimePahe',
-      type: 'direct',
-      data: streamingUrls.consumet_data.providers.animepahe
-    }] : []),
-    ...(streamingUrls?.consumet_data?.providers?.nineanime ? [{
-      id: 'consumet_9anime',
-      name: '9anime (Direct)',
-      description: 'Direct video via Consumet API - 9anime',
-      type: 'direct',
-      data: streamingUrls.consumet_data.providers.nineanime
-    }] : []),
-    
-    // Legacy Consumet format support
-    ...(streamingUrls?.consumet_gogoanime?.sources ? [{
-      id: 'legacy_gogoanime',
-      name: 'Gogoanime (Legacy)',
-      description: 'Legacy Consumet format',
-      type: 'direct',
-      data: streamingUrls.consumet_gogoanime
-    }] : []),
-    ...(streamingUrls?.consumet_zoro?.sources ? [{
-      id: 'legacy_zoro',
-      name: 'Zoro (Legacy)', 
-      description: 'Legacy Consumet format',
-      type: 'direct',
-      data: streamingUrls.consumet_zoro
-    }] : []),
-    
-    // Working embed sources
+    // Primary working iframe sources
     {
       id: 'vidsrc_anime',
       name: 'VidSrc Anime',
       description: 'Reliable anime streaming with good quality',
       type: 'iframe',
       url: streamingUrls?.vidsrc_anime,
-      quality: 'high'
+      quality: 'high',
+      priority: 1
+    },
+    {
+      id: 'vidstreaming',
+      name: 'VidStreaming',
+      description: 'High quality anime streaming',
+      type: 'iframe',
+      url: streamingUrls?.vidstreaming,
+      quality: 'high',
+      priority: 2
+    },
+    {
+      id: 'douvideo',
+      name: 'DouVideo',
+      description: 'Fast anime streaming source',
+      type: 'iframe',
+      url: streamingUrls?.douvideo,
+      quality: 'high',
+      priority: 3
+    },
+    {
+      id: 'vidcloud',
+      name: 'VidCloud',
+      description: 'Reliable streaming with good quality',
+      type: 'iframe',
+      url: streamingUrls?.vidcloud,
+      quality: 'high',
+      priority: 4
     },
     {
       id: 'animefire',
       name: 'AnimeFire',
-      description: 'Fast anime streaming source',
+      description: 'Alternative anime streaming source',
       type: 'iframe',
       url: streamingUrls?.animefire,
-      quality: 'medium'
+      quality: 'medium',
+      priority: 5
     },
     {
       id: 'kawaiifu',
@@ -96,17 +61,27 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
       description: 'Clean anime streaming interface',
       type: 'iframe',
       url: streamingUrls?.kawaiifu,
-      quality: 'medium'
+      quality: 'medium',
+      priority: 6
     },
-    
-    // Watch page links (open in new tab)
+    {
+      id: 'vidsrc',
+      name: 'VidSrc',
+      description: 'General purpose streaming',
+      type: 'iframe',
+      url: streamingUrls?.vidsrc,
+      quality: 'medium',
+      priority: 7
+    },
+    // External watch page sources
     {
       id: 'hianime_watch',
       name: 'HiAnime',
       description: 'Premium anime streaming - Watch Page',
       type: 'external',
       url: streamingUrls?.hianime_watch,
-      quality: 'premium'
+      quality: 'premium',
+      priority: 8
     },
     {
       id: 'gogoanime_watch',
@@ -114,7 +89,8 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
       description: 'Popular anime streaming - Watch Page',
       type: 'external',
       url: streamingUrls?.gogoanime_watch,
-      quality: 'high'
+      quality: 'high',
+      priority: 9
     },
     {
       id: 'nineanime_watch',
@@ -122,7 +98,8 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
       description: 'Well-known anime platform - Watch Page',
       type: 'external',
       url: streamingUrls?.nineanime_watch,
-      quality: 'high'
+      quality: 'high',
+      priority: 10
     },
     {
       id: 'animepahe_watch',
@@ -130,157 +107,64 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
       description: 'High-quality compressed anime - Watch Page',
       type: 'external',
       url: streamingUrls?.animepahe_watch,
-      quality: 'high'
+      quality: 'high',
+      priority: 11
     }
-  ].filter(source => 
-    // Only include sources that have valid URLs or data
-    source.url || (source.data && (source.data.sources || source.data.info))
-  );
+  ].filter(source => source.url && source.url !== 'null').sort((a, b) => a.priority - b.priority);
 
-  // Get available qualities from Consumet data
-  const getAvailableQualities = () => {
-    const currentSourceData = sources.find(s => s.id === currentSource);
-    if (currentSourceData?.type === 'direct') {
-      let qualities = [];
-      
-      if (currentSourceData.data.sources) {
-        // Legacy format
-        qualities = currentSourceData.data.sources.map(source => ({
-          quality: source.quality || 'Unknown',
-          url: source.url,
-          isM3U8: source.url?.includes('.m3u8')
-        }));
-      } else if (currentSourceData.data.info?.episodes) {
-        // New format - need to get episode sources
-        const episode = currentSourceData.data.info.episodes.find(ep => ep.number === episodeNumber);
-        if (episode && streamingUrls?.consumet_data?.allSources) {
-          qualities = streamingUrls.consumet_data.allSources
-            .filter(source => source.provider === currentSourceData.data.provider)
-            .map(source => ({
-              quality: source.quality || 'Unknown',
-              url: source.url,
-              isM3U8: source.url?.includes('.m3u8')
-            }));
-        }
-      }
-      
-      return qualities;
-    }
-    return [];
-  };
-
-  // Get current streaming URL/data
-  const getCurrentStreamingData = () => {
-    const selectedSource = sources.find(s => s.id === currentSource);
-    
-    if (selectedSource?.type === 'direct') {
-      const qualities = getAvailableQualities();
-      const selectedQualitySource = qualities.find(q => q.quality === currentQuality) || qualities[0];
-      
-      // Get subtitles for this source
-      let subtitles = [];
-      if (selectedSource.data.subtitles) {
-        subtitles = selectedSource.data.subtitles;
-      } else if (streamingUrls?.consumet_data?.subtitles) {
-        subtitles = streamingUrls.consumet_data.subtitles.filter(sub => 
-          sub.provider === selectedSource.data.provider
-        );
-      }
-      
-      return {
-        type: 'direct',
-        url: selectedQualitySource?.url,
-        isM3U8: selectedQualitySource?.isM3U8,
-        subtitles: subtitles,
-        qualities: qualities
-      };
-    }
-    
-    return {
-      type: 'iframe',
-      url: selectedSource?.url || streamingUrls?.primary
-    };
-  };
-
-  // Set default source and quality
+  // Set default source on load
   useEffect(() => {
-    if (sources.length > 0) {
-      // Prefer Consumet direct sources
-      const directSource = sources.find(s => s.type === 'direct');
-      setCurrentSource(directSource?.id || sources[0].id);
+    if (sources.length > 0 && !currentSource) {
+      setCurrentSource(sources[0]);
       setPlayerError(false);
-      setRetryCount(0);
-      
-      // Set default quality
-      if (directSource) {
-        const qualities = getAvailableQualities();
-        if (qualities.length > 0) {
-          const bestQuality = qualities.find(q => q.quality === '1080p') || 
-                             qualities.find(q => q.quality === '720p') || 
-                             qualities[0];
-          if (bestQuality) {
-            setCurrentQuality(bestQuality.quality);
-          }
-        }
-      }
     }
-  }, [streamingUrls, sources]);
+  }, [sources, currentSource]);
 
-  // Handle video load errors
-  const handleVideoError = () => {
-    setPlayerError(true);
-    
-    // Auto-retry with next source
-    if (retryCount < sources.length - 1) {
-      setTimeout(() => {
-        const currentIndex = sources.findIndex(s => s.id === currentSource);
-        const nextSource = sources[currentIndex + 1];
-        if (nextSource) {
-          setCurrentSource(nextSource.id);
-          setRetryCount(prev => prev + 1);
-          setPlayerError(false);
-        }
-      }, 2000);
-    }
-  };
-
+  // Handle source selection
   const handleSourceChange = (source) => {
     setCurrentSource(source);
-    setIsPlaying(false);
     setShowSourceSelector(false);
+    setPlayerError(false);
+    setIsLoading(true);
     
     if (source.type === 'external') {
       // Open external watch pages in new tab
       window.open(source.url, '_blank', 'noopener,noreferrer');
       return;
     }
+  };
+
+  // Handle iframe load events
+  const handleIframeLoad = () => {
+    setIsLoading(false);
+    setPlayerError(false);
+  };
+
+  const handleIframeError = () => {
+    setIsLoading(false);
+    setPlayerError(true);
     
-    if (source.type === 'direct' && source.data) {
-      // Handle Consumet API direct sources
-      if (source.data.sources && source.data.sources.length > 0) {
-        const videoSource = source.data.sources.find(s => s.quality === 'auto' || s.quality === 'default') || source.data.sources[0];
-        setCurrentVideoUrl(videoSource.url);
-        setAvailableQualities(source.data.sources);
-        setCurrentQuality(videoSource.quality || 'auto');
-        setSubtitles(source.data.subtitles || []);
-        setIsPlaying(true);
+    // Auto-switch to next source if available
+    const currentIndex = sources.findIndex(s => s.id === currentSource?.id);
+    if (currentIndex < sources.length - 1) {
+      const nextSource = sources[currentIndex + 1];
+      if (nextSource && nextSource.type === 'iframe') {
+        setTimeout(() => {
+          handleSourceChange(nextSource);
+        }, 2000);
       }
-    } else if (source.type === 'iframe' && source.url) {
-      // Handle iframe sources
-      setCurrentVideoUrl(source.url);
-      setIsPlaying(true);
     }
   };
 
-  const currentStreamingData = getCurrentStreamingData();
-
-  if (!currentStreamingData.url) {
+  // Show no sources message if no working sources
+  if (sources.length === 0) {
     return (
       <div className="w-full aspect-video bg-netflix-dark rounded-lg flex items-center justify-center">
         <div className="text-center text-netflix-text-gray">
-          <FaPlay className="text-4xl mb-4 mx-auto opacity-50" />
-          <p>No streaming sources available for this anime episode.</p>
-          <p className="text-sm mt-2">This might be due to regional restrictions or licensing.</p>
+          <FaExclamationTriangle className="text-4xl mb-4 mx-auto text-yellow-500" />
+          <h3 className="text-lg font-semibold mb-2">No Streaming Sources Available</h3>
+          <p className="text-sm">This anime episode is not available for streaming.</p>
+          <p className="text-sm mt-2">This might be due to regional restrictions or licensing issues.</p>
         </div>
       </div>
     );
@@ -288,7 +172,7 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
 
   return (
     <div className="w-full space-y-4">
-      {/* Streaming Controls */}
+      {/* Player Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-netflix-dark rounded-lg">
         <div className="flex items-center space-x-4">
           <h3 className="text-netflix-white font-semibold">
@@ -297,7 +181,7 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
           {playerError && (
             <div className="flex items-center space-x-2 text-yellow-500">
               <FaExclamationTriangle className="text-sm" />
-              <span className="text-sm">Auto-switching source...</span>
+              <span className="text-sm">Source failed, trying next...</span>
             </div>
           )}
           {isLoading && (
@@ -308,70 +192,33 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
           )}
         </div>
 
-        <div className="flex items-center space-x-4">
-          {/* Quality Selector for direct sources */}
-          {currentStreamingData.type === 'direct' && currentStreamingData.qualities?.length > 1 && (
-            <div className="relative">
-              <button
-                onClick={() => setShowQualitySelector(!showQualitySelector)}
-                className="flex items-center space-x-2 px-3 py-1 bg-netflix-gray text-netflix-white rounded-md hover:bg-netflix-gray/80 transition-colors text-sm"
-              >
-                <FaCog />
-                <span>{currentQuality}</span>
-              </button>
+        {/* Source Selector */}
+        <div className="relative">
+          <button
+            onClick={() => setShowSourceSelector(!showSourceSelector)}
+            className="flex items-center space-x-2 px-4 py-2 bg-netflix-red text-netflix-white rounded-md hover:bg-netflix-red-dark transition-colors"
+          >
+            <FaExchangeAlt />
+            <span>Source: {currentSource?.name || 'Select'}</span>
+          </button>
 
-              {showQualitySelector && (
-                <div className="absolute right-0 top-full mt-2 bg-netflix-dark border border-netflix-gray rounded-lg shadow-lg z-10">
-                  <div className="p-2">
-                    <h4 className="text-netflix-white font-semibold mb-2 px-2">Quality:</h4>
-                    {currentStreamingData.qualities.map((quality) => (
-                      <button
-                        key={quality.quality}
-                        onClick={() => {
-                          setCurrentQuality(quality.quality);
-                          setShowQualitySelector(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
-                          currentQuality === quality.quality
-                            ? 'bg-netflix-red text-netflix-white'
-                            : 'text-netflix-text-gray hover:bg-netflix-gray/50'
-                        }`}
-                      >
-                        {quality.quality} {quality.isM3U8 && '(HLS)'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Source Selector */}
-          <div className="relative">
-            <button
-              onClick={() => setShowSourceSelector(!showSourceSelector)}
-              className="flex items-center space-x-2 px-3 py-1 bg-netflix-gray text-netflix-white rounded-md hover:bg-netflix-gray/80 transition-colors text-sm"
-            >
-              <FaExchangeAlt />
-              <span>Source ({sources.length})</span>
-            </button>
-
-            {showSourceSelector && (
-              <div className="absolute right-0 top-full mt-2 bg-netflix-dark border border-netflix-gray rounded-lg shadow-lg z-10 min-w-64">
-                <div className="p-2">
-                  <h4 className="text-netflix-white font-semibold mb-2 px-2">Choose Source:</h4>
+          {showSourceSelector && (
+            <div className="absolute right-0 top-full mt-2 bg-netflix-dark border border-netflix-gray rounded-lg shadow-lg z-10 min-w-80">
+              <div className="p-4">
+                <h4 className="text-netflix-white font-semibold mb-3">Choose Source:</h4>
+                <div className="space-y-2">
                   {sources.map((source) => (
                     <button
                       key={source.id}
                       onClick={() => handleSourceChange(source)}
-                      className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-200 ${
+                      className={`w-full text-left p-3 rounded-lg border transition-all duration-200 ${
                         currentSource?.id === source.id
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          ? 'border-netflix-red bg-netflix-red/10 text-netflix-white'
+                          : 'border-netflix-gray hover:border-netflix-gray/50 hover:bg-netflix-gray/20 text-netflix-text-gray'
                       }`}
                     >
-                      <div className="flex items-center space-x-3">
-                        <div className="flex flex-col items-start">
+                      <div className="flex items-center justify-between">
+                        <div className="flex flex-col">
                           <div className="flex items-center space-x-2">
                             <span className="font-medium">{source.name}</span>
                             {source.quality === 'premium' && (
@@ -381,126 +228,107 @@ function AnimeStreamingPlayer({ streamingUrls, animeTitle, episodeNumber, season
                             )}
                             {source.quality === 'high' && (
                               <span className="px-2 py-1 text-xs bg-green-500 text-white rounded-full font-semibold">
-                                HD+
+                                HD
                               </span>
                             )}
                             {source.quality === 'medium' && (
                               <span className="px-2 py-1 text-xs bg-blue-500 text-white rounded-full font-semibold">
-                                HD
-                              </span>
-                            )}
-                            {source.type === 'direct' && (
-                              <span className="px-2 py-1 text-xs bg-orange-500 text-white rounded-full font-semibold">
-                                DIRECT
+                                SD
                               </span>
                             )}
                             {source.type === 'external' && (
                               <span className="px-2 py-1 text-xs bg-gray-500 text-white rounded-full font-semibold">
-                                WATCH PAGE
+                                EXTERNAL
                               </span>
                             )}
                           </div>
-                          <span className="text-sm text-gray-600">{source.description}</span>
+                          <span className="text-sm text-netflix-text-gray mt-1">{source.description}</span>
                         </div>
+                        {source.type === 'external' && (
+                          <FaExternalLinkAlt className="h-4 w-4 text-netflix-text-gray" />
+                        )}
                       </div>
-                      {source.type === 'external' && (
-                        <FaExternalLinkAlt className="h-4 w-4 text-gray-400" />
-                      )}
                     </button>
                   ))}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Video Player */}
-      <div className="w-full aspect-video bg-netflix-black rounded-lg overflow-hidden">
-        {playerError ? (
-          <div className="w-full h-full flex items-center justify-center bg-netflix-dark">
+      <div className="w-full aspect-video bg-netflix-black rounded-lg overflow-hidden relative">
+        {playerError && (
+          <div className="absolute inset-0 bg-netflix-black/80 flex items-center justify-center z-10">
             <div className="text-center text-netflix-text-gray">
-              <FaExclamationTriangle className="text-4xl mb-4 mx-auto text-yellow-500" />
-              <p>Error loading this source</p>
-              <p className="text-sm mt-2">Trying next available source...</p>
+              <FaExclamationTriangle className="text-4xl mb-4 mx-auto text-red-500" />
+              <h3 className="text-lg font-semibold mb-2">Playback Error</h3>
+              <p className="text-sm mb-4">Unable to load this source. Trying next available source...</p>
+              <div className="flex justify-center space-x-2">
+                <button 
+                  onClick={() => {
+                    const nextIndex = (sources.findIndex(s => s.id === currentSource?.id) + 1) % sources.length;
+                    handleSourceChange(sources[nextIndex]);
+                  }}
+                  className="bg-netflix-red text-netflix-white px-4 py-2 rounded hover:bg-netflix-red-dark transition-colors"
+                >
+                  Try Next Source
+                </button>
+                <button 
+                  onClick={() => setPlayerError(false)}
+                  className="bg-netflix-gray text-netflix-white px-4 py-2 rounded hover:bg-netflix-gray/80 transition-colors"
+                >
+                  Retry Current
+                </button>
+              </div>
             </div>
           </div>
-        ) : currentStreamingData.type === 'direct' ? (
-          <video
-            ref={videoRef}
-            src={currentStreamingData.url}
-            className="w-full h-full"
-            controls
-            autoPlay
-            onError={handleVideoError}
-            onLoadStart={() => setIsLoading(true)}
-            onLoadedData={() => setIsLoading(false)}
-          >
-            {/* Add subtitles from Consumet */}
-            {currentStreamingData.subtitles?.map((subtitle, index) => (
-              <track
-                key={index}
-                kind="subtitles"
-                src={subtitle.url}
-                srcLang={subtitle.lang || 'en'}
-                label={subtitle.lang || `Subtitle ${index + 1}`}
-                default={index === 0}
-              />
-            ))}
-            Your browser does not support the video tag.
-          </video>
-        ) : (
+        )}
+
+        {isLoading && (
+          <div className="absolute inset-0 bg-netflix-black/80 flex items-center justify-center z-10">
+            <div className="text-center text-netflix-text-gray">
+              <div className="animate-spin w-12 h-12 border-4 border-netflix-red border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-lg font-semibold">Loading Player...</p>
+              <p className="text-sm mt-2">Setting up {currentSource?.name}...</p>
+            </div>
+          </div>
+        )}
+
+        {currentSource && currentSource.type === 'iframe' && (
           <iframe
-            src={currentStreamingData.url}
-            className="w-full h-full"
+            key={currentSource.id}
+            src={currentSource.url}
+            className="w-full h-full border-0"
             allowFullScreen
-            frameBorder="0"
-            title={`${animeTitle} Episode ${episodeNumber}`}
-            onError={handleVideoError}
-            onLoad={() => setPlayerError(false)}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            onLoad={handleIframeLoad}
+            onError={handleIframeError}
+            title={`${animeTitle} Episode ${episodeNumber} - ${currentSource.name}`}
           />
         )}
       </div>
 
-      {/* Source Info */}
+      {/* Player Info */}
       <div className="bg-netflix-dark rounded-lg p-4">
-        <div className="flex items-center space-x-3">
-          <FaInfoCircle className="text-netflix-red" />
-          <div className="text-netflix-text-gray text-sm">
-            <div className="mb-1">
-              <span className="font-medium">Currently using:</span> <span className="text-netflix-white">
-                {sources.find(s => s.id === currentSource)?.name || 'Default Source'}
-              </span>
-              {currentStreamingData.type === 'direct' && (
-                <span className="bg-green-600 text-white text-xs px-1 rounded ml-2">DIRECT VIDEO</span>
-              )}
-              {retryCount > 0 && (
-                <span className="text-yellow-500 ml-2">(Auto-switched {retryCount} time{retryCount > 1 ? 's' : ''})</span>
-              )}
-            </div>
-            <div className="mb-1">
-              <span className="font-medium">Available sources:</span> <span className="text-netflix-white">
-                {sources.length} sources detected ({sources.filter(s => s.type === 'direct').length} direct, {sources.filter(s => s.type === 'iframe').length} iframe)
-              </span>
-            </div>
-            {currentStreamingData.type === 'direct' && currentStreamingData.qualities?.length > 0 && (
-              <div className="mb-1">
-                <span className="font-medium">Available qualities:</span> <span className="text-netflix-white">
-                  {currentStreamingData.qualities.map(q => q.quality).join(', ')}
-                </span>
-              </div>
-            )}
-            {currentStreamingData.subtitles?.length > 0 && (
-              <div className="mb-1">
-                <span className="font-medium">Subtitles:</span> <span className="text-netflix-white">
-                  {currentStreamingData.subtitles.length} available
-                </span>
-              </div>
-            )}
+        <div className="flex items-start space-x-3">
+          <FaInfoCircle className="text-netflix-red mt-1 flex-shrink-0" />
+          <div className="text-netflix-text-gray text-sm space-y-1">
             <div>
-              <span className="font-medium">Powered by:</span> <span className="text-netflix-white">
-                Consumet API {currentStreamingData.type === 'direct' ? '(Direct streaming)' : '+ Fallback providers'}
+              <span className="font-medium">Currently using:</span> 
+              <span className="text-netflix-white ml-1">{currentSource?.name || 'None'}</span>
+              <span className="text-netflix-text-gray ml-2">({currentSource?.quality || 'Unknown'} quality)</span>
+            </div>
+            <div>
+              <span className="font-medium">Available sources:</span> 
+              <span className="text-netflix-white ml-1">{sources.length} total</span>
+              <span className="text-netflix-text-gray ml-2">
+                ({sources.filter(s => s.type === 'iframe').length} iframe, {sources.filter(s => s.type === 'external').length} external)
               </span>
+            </div>
+            <div className="text-xs text-netflix-text-gray pt-2">
+              <strong>Note:</strong> If a source doesn't work, try switching to another one. External sources will open in a new tab.
             </div>
           </div>
         </div>
